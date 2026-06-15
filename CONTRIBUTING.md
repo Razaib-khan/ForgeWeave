@@ -98,7 +98,7 @@ python -m venv .venv
 source .venv/bin/activate        # On Windows: .venv\Scripts\activate
 
 # 4. Install dependencies (including dev dependencies)
-pip install -e ".[dev]"
+python -m pip install -e ".[dev]"
 
 # 5. Install pre-commit hooks
 pre-commit install
