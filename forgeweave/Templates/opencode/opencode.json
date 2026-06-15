@@ -1,11 +1,10 @@
 {
-  "project": {
-    "name": "${PROJECT_NAME}",
-    "description": "A ForgeWeave-powered development environment"
-  },
-  "agent": {
-    "role": "forgeweave-agent",
-    "spec_path": "AGENT.md",
-    "skills_path": "skills/"
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "permission": {
+    "edit": "ask",
+    "bash": "ask"
   }
 }
