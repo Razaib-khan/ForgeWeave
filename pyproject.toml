@@ -1,7 +1,66 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
 [project]
-name = "s-expertagent"
+name = "forgeweave"
 version = "0.1.0"
-description = "Add your description here"
+description = "A behavioral execution framework for AI agents inside development environments"
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.14"
-dependencies = []
+authors = [
+    { name = "ForgeWeave Contributors" },
+]
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "inquirerpy>=0.3.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "pre-commit>=3.6",
+    "ruff>=0.3",
+    "mypy>=1.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/Razaib-khan/forgeweave"
+Repository = "https://github.com/Razaib-khan/forgeweave"
+Documentation = "https://github.com/Razaib-khan/forgeweave#readme"
+Issues = "https://github.com/Razaib-khan/forgeweave/issues"
+Discussions = "https://github.com/Razaib-khan/forgeweave/discussions"
+Changelog = "https://github.com/Razaib-khan/forgeweave/blob/main/CHANGELOG.md"
+
+[project.scripts]
+forge = "forgeweave.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "--cov=forgeweave --cov-report=term-missing"
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "N", "D"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+ignore_missing_imports = true
