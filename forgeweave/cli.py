@@ -3,7 +3,7 @@
 import argparse
 import sys
 from pathlib import Path
-from shutil import copytree, copy2
+from shutil import copytree
 from typing import NoReturn
 
 from forgeweave import __version__
@@ -51,11 +51,6 @@ def init_forge(tui: str) -> None:
 
     target_dir = Path.cwd() / f".{tui}"
     copytree(template_dir, target_dir, dirs_exist_ok=True)
-
-    dest_opencode = target_dir / "opencode.json"
-    opencode_json = forge_root / "opencode.json"
-    if opencode_json.exists() and opencode_json.resolve() != dest_opencode.resolve():
-        copy2(opencode_json, dest_opencode)
 
     print("Forge project initialized successfully!")
 
