@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 def test_core_imports():
     import forgeweave
 
-    assert forgeweave.__version__ == "1.0.0"
+    assert forgeweave.__version__ == "1.0.1"
 
     from forgeweave import db, registry, server, cli
 
