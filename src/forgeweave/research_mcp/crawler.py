@@ -63,6 +63,7 @@ class Crawler:
     async def _fetch(self, url: str) -> str:
         from urllib.parse import urlparse
 
+        assert self.session is not None
         domain = urlparse(url).netloc
         async with self.semaphore:
             await self.rate_limiter.wait(domain)

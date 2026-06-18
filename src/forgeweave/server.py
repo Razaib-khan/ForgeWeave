@@ -16,6 +16,7 @@ import sys
 import threading
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from fastmcp import FastMCP
 
@@ -158,7 +159,7 @@ def _load_hook_metadata(project_dir: Path) -> list[str]:
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_init(
     tui: str = "opencode",
     project_dir: str = "",
@@ -233,7 +234,7 @@ def forge_init(
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_execute_command(
     command: str,
     args: str = "",
@@ -271,7 +272,7 @@ def forge_execute_command(
     fdb.add_trace(db_path, job, "pre_command", {"command": cmd_name})
 
     handler = entry.get("handler", "tool")
-    result = {}
+    result: dict[str, Any] = {}
 
     try:
         if handler == "tool":
@@ -345,7 +346,7 @@ def _route_to_tool(tool_name: str, args: str, context: dict | None, job_id: str)
 
 def _parse_args(args: str) -> dict:
     """Parse command args into a dict. Supports --key=value and positional."""
-    result = {}
+    result: dict[str, Any] = {}
     parts = args.strip().split()
     positional = []
     i = 0
@@ -373,7 +374,7 @@ def _parse_args(args: str) -> dict:
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_execute_skill(
     skill: str,
     params: dict | None = None,
@@ -464,7 +465,7 @@ def _execute_skill_internal(proj: Path, db_path: Path, skill: str, params: dict)
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_create_agent(
     agent_id: str,
     role: str,
@@ -567,7 +568,7 @@ constraints: "{constraints}"
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_research(
     topic: str,
     depth: str = "standard",
@@ -649,7 +650,7 @@ def forge_research(
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_search(
     query: str,
     max_results: int = 5,
@@ -753,7 +754,7 @@ def forge_search(
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_load_context(project_dir: str = "") -> dict:
     """Load project state into a structured snapshot.
 
@@ -797,7 +798,7 @@ def forge_load_context(project_dir: str = "") -> dict:
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_validate(
     target: str,
     rules: list[str] | None = None,
@@ -859,7 +860,7 @@ def forge_validate(
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_memory_write(
     key: str,
     value: str,
@@ -901,7 +902,7 @@ def forge_memory_write(
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_memory_read(
     key: str = "",
     namespace: str = "",
@@ -946,7 +947,7 @@ def forge_memory_read(
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_status(job_id: str) -> dict:
     """Poll the status of any long-running job.
 
@@ -990,7 +991,7 @@ def forge_status(job_id: str) -> dict:
 # ═══════════════════════════════════════════════════════════════
 
 
-@mcp.tool
+@mcp.tool()
 def forge_capabilities(project_dir: str = "") -> dict:
     """List all available tools, skills, agents, and commands.
 
@@ -1052,7 +1053,7 @@ def forge_capabilities(project_dir: str = "") -> dict:
         },
     ]
 
-    result = {
+    result: dict[str, Any] = {
         "status": "ok",
         "server_version": FORGE_VERSION,
         "tools": tools,

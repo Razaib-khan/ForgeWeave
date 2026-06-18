@@ -46,7 +46,7 @@ warmup()
 log.info("Server initialized — 10 tools + 1 deprecated (research_deep_research)")
 
 
-@mcp.tool
+@mcp.tool()
 async def research_single_source(url: str, mode: str = "main_text") -> ExtractedContent:
     """Fetch a single URL and extract clean readable content.
 
@@ -95,7 +95,7 @@ async def research_single_source(url: str, mode: str = "main_text") -> Extracted
     return ExtractedContent(url=url, text=html)
 
 
-@mcp.tool
+@mcp.tool()
 async def research_crawl_urls(
     urls: list[str],
     max_concurrency: int = 5,
@@ -131,7 +131,7 @@ async def research_crawl_urls(
     return "\n".join(report_lines)
 
 
-@mcp.tool
+@mcp.tool()
 async def research_browse_js(url: str, screenshot: bool = False) -> str:
     """Fetch a JavaScript-rendered page using Playwright headless browser.
 
@@ -154,7 +154,7 @@ async def research_browse_js(url: str, screenshot: bool = False) -> str:
     return "\n".join(lines)
 
 
-@mcp.tool
+@mcp.tool()
 async def research_screenshot(url: str) -> str:
     """Take a full-page screenshot of a URL.
 
@@ -171,7 +171,7 @@ async def research_screenshot(url: str) -> str:
     return f"[Screenshot of {url}] — Title: {result.get('title', '')} — Base64 ({b64_len} bytes)"
 
 
-@mcp.tool
+@mcp.tool()
 async def research_extract_document(filepath: str) -> str:
     """Extract text from a PDF, DOCX, or other document file.
 
@@ -199,7 +199,7 @@ async def research_extract_document(filepath: str) -> str:
         return f"Error extracting document: {e}"
 
 
-@mcp.tool
+@mcp.tool()
 async def research_index_latest(
     url: str,
     title: str = "",
@@ -243,7 +243,7 @@ async def research_index_latest(
     return f"Indexed: {doc_title} ({len(content.text)} chars). Total documents: {stats['count']}"
 
 
-@mcp.tool
+@mcp.tool()
 async def research_search(query: str, n_results: int = 5, source_filter: str | None = None) -> str:
     """Search indexed documents by semantic meaning.
 
@@ -275,7 +275,7 @@ async def research_search(query: str, n_results: int = 5, source_filter: str | N
     return "\n".join(lines)
 
 
-@mcp.tool
+@mcp.tool()
 async def research_synthesize(
     query: str,
     n_sources: int = 5,
@@ -332,7 +332,7 @@ async def research_synthesize(
     )
 
 
-@mcp.tool
+@mcp.tool()
 async def research_deep_research(
     topic: str,
     urls: list[str] | None = None,
@@ -450,7 +450,7 @@ async def research_deep_research(
     )
 
 
-@mcp.tool
+@mcp.tool()
 async def research_vector_stats() -> str:
     """Show statistics about the vector database (document count, cache usage)."""
     vs = collection_stats()
@@ -464,7 +464,7 @@ async def research_vector_stats() -> str:
     )
 
 
-@mcp.tool
+@mcp.tool()
 async def research_clear_cache() -> str:
     """Clear HTTP and LLM caches to force fresh fetches and recomputation."""
     from forgeweave.research_mcp.cache import http_cache, llm_cache
