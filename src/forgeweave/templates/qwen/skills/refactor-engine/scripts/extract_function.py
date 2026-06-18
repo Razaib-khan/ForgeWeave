@@ -1,4 +1,5 @@
 """Extract a selected code block into a new function."""
+
 import argparse
 from pathlib import Path
 
@@ -25,7 +26,9 @@ def main():
     parser.add_argument("--name", required=True, help="New function name")
     parser.add_argument("--start", type=int, required=True, help="Start line")
     parser.add_argument("--end", type=int, required=True, help="End line (inclusive)")
-    parser.add_argument("--output", type=Path, help="Output file for extracted function (default: --file)")
+    parser.add_argument(
+        "--output", type=Path, help="Output file for extracted function (default: --file)"
+    )
     args = parser.parse_args()
 
     func = extract_function(args.file, args.name, args.start, args.end)

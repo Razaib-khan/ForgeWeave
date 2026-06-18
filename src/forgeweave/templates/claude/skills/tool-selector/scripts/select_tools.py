@@ -2,9 +2,9 @@
 
 Includes both the forge.* control plane tools and the research_* data plane tools.
 """
+
 import argparse
 import json
-from pathlib import Path
 
 
 TOOL_REGISTRY = {
@@ -12,15 +12,27 @@ TOOL_REGISTRY = {
     "forge_init": {"mcp": "forge.init", "description": "Initialize ForgeWeave in a project"},
     "forge_exec_command": {"mcp": "forge.execute_command", "description": "Route /forge-* command"},
     "forge_exec_skill": {"mcp": "forge.execute_skill", "description": "Execute a skill by name"},
-    "forge_create_agent": {"mcp": "forge.create_agent", "description": "Create agent definition file"},
+    "forge_create_agent": {
+        "mcp": "forge.create_agent",
+        "description": "Create agent definition file",
+    },
     "forge_research": {"mcp": "forge.research", "description": "Full deep-research pipeline"},
     "forge_search": {"mcp": "forge.search", "description": "Lightweight web lookup"},
-    "forge_load_context": {"mcp": "forge.load_context", "description": "Load project state snapshot"},
+    "forge_load_context": {
+        "mcp": "forge.load_context",
+        "description": "Load project state snapshot",
+    },
     "forge_validate": {"mcp": "forge.validate", "description": "Validate outputs against rules"},
     "forge_memory_read": {"mcp": "forge.memory_read", "description": "Read from persistent memory"},
-    "forge_memory_write": {"mcp": "forge.memory_write", "description": "Write to persistent memory"},
+    "forge_memory_write": {
+        "mcp": "forge.memory_write",
+        "description": "Write to persistent memory",
+    },
     "forge_status": {"mcp": "forge.status", "description": "Poll job status"},
-    "forge_capabilities": {"mcp": "forge.capabilities", "description": "List available tools and skills"},
+    "forge_capabilities": {
+        "mcp": "forge.capabilities",
+        "description": "List available tools and skills",
+    },
     # Data plane: research_* tools
     "fetch_url": {"mcp": "research_single_source", "description": "Fetch a single URL"},
     "crawl": {"mcp": "research_crawl_urls", "description": "Crawl multiple URLs"},
@@ -42,7 +54,16 @@ TASK_TOOL_MAP = {
     "command": ["forge_exec_command"],
     "skill_exec": ["forge_exec_skill", "forge_load_context"],
     "agent_create": ["forge_create_agent"],
-    "research": ["forge_research", "forge_status", "forge_memory_write", "crawl", "fetch_url", "browse_js", "search", "synthesize"],
+    "research": [
+        "forge_research",
+        "forge_status",
+        "forge_memory_write",
+        "crawl",
+        "fetch_url",
+        "browse_js",
+        "search",
+        "synthesize",
+    ],
     "quick_search": ["forge_search"],
     "validate": ["forge_validate"],
     "memory": ["forge_memory_read", "forge_memory_write"],

@@ -1,17 +1,24 @@
 """Detect the test framework used by a project."""
+
 import argparse
 from pathlib import Path
 
 
 CONFIG_INDICATORS = {
     "pytest": [
-        "pytest.ini", "pyproject.toml", "setup.cfg", "conftest.py",
+        "pytest.ini",
+        "pyproject.toml",
+        "setup.cfg",
+        "conftest.py",
     ],
     "vitest": [
-        "vitest.config.ts", "vitest.config.js",
+        "vitest.config.ts",
+        "vitest.config.js",
     ],
     "jest": [
-        "jest.config.ts", "jest.config.js", "jest.config.mjs",
+        "jest.config.ts",
+        "jest.config.js",
+        "jest.config.mjs",
     ],
     "unittest": [],  # Python built-in, no config needed
     "node:test": [],  # Node.js built-in
@@ -27,6 +34,7 @@ def detect_framework(project_root: Path) -> str | None:
     pkg_json = project_root / "package.json"
     if pkg_json.exists():
         import json
+
         try:
             pkg = json.loads(pkg_json.read_text())
             dev_deps = {**pkg.get("dependencies", {}), **pkg.get("devDependencies", {})}
@@ -34,7 +42,7 @@ def detect_framework(project_root: Path) -> str | None:
                 return "vitest"
             if "jest" in dev_deps:
                 return "jest"
-        except (json.JSONDecodeError, KeyError):
+        except json.JSONDecodeError, KeyError:
             pass
     # Check Python
     if (project_root / "pyproject.toml").exists():
@@ -53,6 +61,7 @@ def main():
     else:
         print("unknown")
         import sys
+
         sys.exit(1)
 
 

@@ -4,19 +4,20 @@
 Bridges Claude's tool execution events to forge-mcp validation layer.
 Blocks dangerous commands and sensitive file operations.
 """
+
 import sys
 import json
 import re
 
 
 DANGEROUS_PATTERNS = [
-    (r'rm\s+.*-[rR]f', "Recursive force-delete blocked"),
-    (r'sudo\s+rm', "Sudo delete blocked"),
-    (r'chmod\s+777', "World-writable permissions blocked"),
-    (r'>\s*/etc/', "System file overwrite blocked"),
-    (r'\|\s*(sh|bash|zsh)\s*$', "Pipe-to-shell execution blocked"),
-    (r':(){ :\|:& };:', "Fork bomb blocked"),
-    (r'mkfs|dd\s+if=/dev/zero', "Filesystem destruction blocked"),
+    (r"rm\s+.*-[rR]f", "Recursive force-delete blocked"),
+    (r"sudo\s+rm", "Sudo delete blocked"),
+    (r"chmod\s+777", "World-writable permissions blocked"),
+    (r">\s*/etc/", "System file overwrite blocked"),
+    (r"\|\s*(sh|bash|zsh)\s*$", "Pipe-to-shell execution blocked"),
+    (r":(){ :\|:& };:", "Fork bomb blocked"),
+    (r"mkfs|dd\s+if=/dev/zero", "Filesystem destruction blocked"),
 ]
 
 
@@ -37,7 +38,14 @@ def main():
     if tool_name in ("str_replace_editor", "Read", "Write"):
         path = tool_input.get("path", tool_input.get("file_path", ""))
         if ".env" in path or "secrets" in path.lower() or "credentials" in path.lower():
-            print(json.dumps({"decision": "block", "reason": "Security Policy: Sensitive file access blocked"}))
+            print(
+                json.dumps(
+                    {
+                        "decision": "block",
+                        "reason": "Security Policy: Sensitive file access blocked",
+                    }
+                )
+            )
             sys.exit(0)
 
     print(json.dumps({"decision": "approve"}))

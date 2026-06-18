@@ -1,7 +1,9 @@
 """Persist and retrieve key-value data across sessions."""
+
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 
 
@@ -41,11 +43,13 @@ def clear(namespace: str | None = None):
         path = get_cache_dir() / namespace
         if path.exists():
             import shutil
+
             shutil.rmtree(path)
     else:
         path = get_cache_dir()
         if path.exists():
             import shutil
+
             shutil.rmtree(path)
 
 
@@ -61,7 +65,7 @@ def main():
     if args.action == "save":
         if not args.key or not args.data:
             print("--key and --data required for save", file=sys.stderr)
-            import sys; sys.exit(1)
+            sys.exit(1)
         data = json.loads(args.data)
         path = save(args.key, data, args.namespace)
         print(f"Saved to {path}")
@@ -69,13 +73,13 @@ def main():
     elif args.action == "load":
         if not args.key:
             print("--key required for load", file=sys.stderr)
-            import sys; sys.exit(1)
+            sys.exit(1)
         data = load(args.key, args.namespace)
         if data:
             print(json.dumps(data, indent=2))
         else:
             print(f"Key '{args.key}' not found in namespace '{args.namespace}'")
-            import sys; sys.exit(1)
+            sys.exit(1)
 
     elif args.action == "search":
         results = search(args.query or "", args.namespace)

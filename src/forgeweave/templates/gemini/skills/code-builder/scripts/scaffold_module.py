@@ -1,4 +1,5 @@
 """Scaffold a new module with standard folder structure."""
+
 import argparse
 from pathlib import Path
 

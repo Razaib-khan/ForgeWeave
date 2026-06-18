@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave pre_research hook — creates job entry, validates constraints."""
+
 import sys
 import json
 from datetime import datetime
@@ -12,7 +13,12 @@ def main():
     depth = input_data.get("depth", "standard")
 
     if not topic or len(topic.strip()) < 10:
-        print(json.dumps({"decision": "block", "reason": "Topic too vague. Provide at least 10 characters."}), file=sys.stderr)
+        print(
+            json.dumps(
+                {"decision": "block", "reason": "Topic too vague. Provide at least 10 characters."}
+            ),
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     research_dir = Path("research")

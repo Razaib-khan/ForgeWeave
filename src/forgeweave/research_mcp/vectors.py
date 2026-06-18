@@ -41,7 +41,9 @@ def index_document(url: str, title: str, text: str, source: str, date: str = "")
     collection.upsert(
         ids=[doc_id],
         documents=[text],
-        metadatas=[{"url": url, "title": title, "source": source, "date": date, "doc_type": "article"}],
+        metadatas=[
+            {"url": url, "title": title, "source": source, "date": date, "doc_type": "article"}
+        ],
     )
 
 
@@ -64,12 +66,14 @@ def search_documents(query: str, n_results: int = 5, where: dict | None = None) 
     output = []
     if results["ids"] and results["ids"][0]:
         for i, doc_id in enumerate(results["ids"][0]):
-            output.append({
-                "doc_id": doc_id,
-                "text": results["documents"][0][i] if results.get("documents") else "",
-                "metadata": results["metadatas"][0][i] if results.get("metadatas") else {},
-                "distance": results["distances"][0][i] if results.get("distances") else None,
-            })
+            output.append(
+                {
+                    "doc_id": doc_id,
+                    "text": results["documents"][0][i] if results.get("documents") else "",
+                    "metadata": results["metadatas"][0][i] if results.get("metadatas") else {},
+                    "distance": results["distances"][0][i] if results.get("distances") else None,
+                }
+            )
     return output
 
 

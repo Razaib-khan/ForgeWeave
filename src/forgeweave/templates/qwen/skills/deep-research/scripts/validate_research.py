@@ -1,4 +1,5 @@
 """Validate research outputs for source traceability and structure."""
+
 import argparse
 import re
 import sys
@@ -35,7 +36,9 @@ def check_file(path: Path) -> dict:
 def main():
     parser = argparse.ArgumentParser(description="Validate research outputs")
     parser.add_argument("files", nargs="+", type=Path, help="Research markdown files to validate")
-    parser.add_argument("--threshold", type=float, default=0.8, help="Minimum source ratio (default: 0.8)")
+    parser.add_argument(
+        "--threshold", type=float, default=0.8, help="Minimum source ratio (default: 0.8)"
+    )
     args = parser.parse_args()
 
     all_pass = True
@@ -46,7 +49,9 @@ def main():
             continue
         result = check_file(f)
         status = "PASS" if result["source_ratio"] >= args.threshold else "FAIL"
-        print(f"[{status}] {f.name}: {result['with_source']}/{result['total_claims']} claims sourced ({result['source_ratio']:.0%})")
+        print(
+            f"[{status}] {f.name}: {result['with_source']}/{result['total_claims']} claims sourced ({result['source_ratio']:.0%})"
+        )
         if result["source_ratio"] < args.threshold:
             print(f"  First {len(result['unsupported'])} unsupported claims:")
             for c in result["unsupported"]:

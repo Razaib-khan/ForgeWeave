@@ -1,4 +1,5 @@
 """Generate agent definition files for each TUI from a role description."""
+
 import argparse
 from pathlib import Path
 
@@ -94,8 +95,12 @@ def main():
     parser.add_argument("--role", required=True, help="Human-readable role name")
     parser.add_argument("--description", "-d", required=True, help="One-line description")
     parser.add_argument("--rules", required=True, help="Agent instructions/system prompt")
-    parser.add_argument("--tui", choices=list(TUI_TEMPLATES.keys()), default="opencode", help="Target TUI")
-    parser.add_argument("--output", "-o", type=Path, required=True, help="Output directory (agents/)")
+    parser.add_argument(
+        "--tui", choices=list(TUI_TEMPLATES.keys()), default="opencode", help="Target TUI"
+    )
+    parser.add_argument(
+        "--output", "-o", type=Path, required=True, help="Output directory (agents/)"
+    )
     parser.add_argument("--edit", choices=["allow", "deny", "ask"], default="ask")
     parser.add_argument("--write", choices=["allow", "deny", "ask"], default="ask")
     args = parser.parse_args()

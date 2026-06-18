@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave post_command hook — logs execution result, stores output in memory."""
+
 import sys
 import json
 from datetime import datetime
@@ -27,4 +28,5 @@ def main():
 
 if __name__ == "__main__":
     from pathlib import Path
+
     main()

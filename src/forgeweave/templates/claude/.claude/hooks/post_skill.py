@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave post_skill hook — stores result, generates trace."""
+
 import sys
 import json
 from datetime import datetime

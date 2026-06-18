@@ -1,4 +1,5 @@
 """Generate a structured research plan from a topic string."""
+
 import argparse
 import json
 import sys
@@ -54,9 +55,13 @@ def main():
     parser = argparse.ArgumentParser(description="Generate research plan")
     parser.add_argument("topic", help="Research topic")
     parser.add_argument("--depth", choices=["quick", "standard", "deep"], default="standard")
-    parser.add_argument("--focus", choices=["usage", "architecture", "comparison", "general"], default="usage")
+    parser.add_argument(
+        "--focus", choices=["usage", "architecture", "comparison", "general"], default="usage"
+    )
     parser.add_argument("--output", default="research", help="Output directory")
-    parser.add_argument("--validate", metavar="PLAN_JSON", help="Validate an existing plan JSON file")
+    parser.add_argument(
+        "--validate", metavar="PLAN_JSON", help="Validate an existing plan JSON file"
+    )
     args = parser.parse_args()
 
     if args.validate:

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Claude native hook — logs tool failures for debugging."""
+
 import sys
 import json
 from datetime import datetime

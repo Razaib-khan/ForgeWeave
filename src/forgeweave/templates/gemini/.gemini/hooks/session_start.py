@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Gemini hook: load project state on session start."""
+
 import sys
 import json
 from datetime import datetime
 from pathlib import Path
+
 
 def main():
     data = json.loads(sys.stdin.read())
@@ -18,6 +20,7 @@ def main():
         f.write(json.dumps(record) + "\n")
     print(json.dumps({"decision": "allow"}))
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

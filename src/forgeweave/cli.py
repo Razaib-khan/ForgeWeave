@@ -6,7 +6,9 @@ Usage:
     forge mcp [--verbose]
     forge --version
 """
+
 import argparse
+import importlib
 import os
 import sys
 from pathlib import Path
@@ -50,6 +52,7 @@ def cmd_doctor(args: argparse.Namespace) -> None:
     # Check package installation
     try:
         import forgeweave
+
         print(f"ForgeWeave: {forgeweave.__version__}")
     except ImportError:
         print("ForgeWeave: NOT INSTALLED")
@@ -67,14 +70,14 @@ def cmd_doctor(args: argparse.Namespace) -> None:
     # Check optional dependencies
     try:
         import fastmcp
+
         print(f"FastMCP: {fastmcp.__version__ if hasattr(fastmcp, '__version__') else 'installed'}")
     except ImportError:
         print("FastMCP: NOT INSTALLED (required for MCP server)")
 
-    try:
-        import playwright
-        print(f"Playwright: installed")
-    except ImportError:
+    if importlib.util.find_spec("playwright"):
+        print("Playwright: installed")
+    else:
         print("Playwright: NOT INSTALLED (optional, needed for JS rendering)")
 
     if okay:
@@ -86,6 +89,7 @@ def cmd_doctor(args: argparse.Namespace) -> None:
 def cmd_mcp(args: argparse.Namespace) -> None:
     """Start the ForgeWeave MCP server."""
     from forgeweave.server import main as server_main
+
     server_main(verbose=args.verbose)
 
 
@@ -104,12 +108,19 @@ def main() -> None:
 
     # forge init
     init_p = sub.add_parser("init", help="Initialize ForgeWeave in a project")
-    init_p.add_argument("--tui", required=True, choices=["opencode", "claude", "gemini", "qwen"],
-                        help="Target TUI adapter")
-    init_p.add_argument("project_dir", nargs="?", default="",
-                        help="Project directory (default: CWD or FORGE_PROJECT_DIR)")
-    init_p.add_argument("--overwrite", action="store_true",
-                        help="Overwrite existing files")
+    init_p.add_argument(
+        "--tui",
+        required=True,
+        choices=["opencode", "claude", "gemini", "qwen"],
+        help="Target TUI adapter",
+    )
+    init_p.add_argument(
+        "project_dir",
+        nargs="?",
+        default="",
+        help="Project directory (default: CWD or FORGE_PROJECT_DIR)",
+    )
+    init_p.add_argument("--overwrite", action="store_true", help="Overwrite existing files")
     init_p.set_defaults(func=cmd_init)
 
     # forge doctor
@@ -118,8 +129,7 @@ def main() -> None:
 
     # forge mcp
     mcp_p = sub.add_parser("mcp", help="Start ForgeWeave MCP server")
-    mcp_p.add_argument("--verbose", "-v", action="store_true",
-                       help="Enable debug logging")
+    mcp_p.add_argument("--verbose", "-v", action="store_true", help="Enable debug logging")
     mcp_p.set_defaults(func=cmd_mcp)
 
     args = parser.parse_args()

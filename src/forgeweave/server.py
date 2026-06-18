@@ -4,6 +4,7 @@ Design: Expose capabilities, hide orchestration.
 All 5 pipeline stages (plan, research, validate, synthesize, output) are
 internal to forge.research and never exposed as separate MCP tools.
 """
+
 import asyncio
 import json
 import logging
@@ -41,10 +42,16 @@ FORGE_VERSION = "1.0.0"
 SUPPORTED_TUIS = ["opencode", "claude", "gemini", "qwen"]
 
 VALIDATION_RULES = {
-    "every_claim_has_source": lambda text: bool(re.findall(r'\[([^\]]+)\]\(https?://[^)]+\)', text)),
-    "no_blog_sources": lambda text: not bool(re.search(r'(blog|changelog|medium\.com|dev\.to)', text, re.I)),
+    "every_claim_has_source": lambda text: bool(
+        re.findall(r"\[([^\]]+)\]\(https?://[^)]+\)", text)
+    ),
+    "no_blog_sources": lambda text: (
+        not bool(re.search(r"(blog|changelog|medium\.com|dev\.to)", text, re.I))
+    ),
     "structure_complete": lambda text: all(s in text for s in ["## Overview", "## Sources"]),
-    "no_secrets": lambda text: not bool(re.search(r'(api[_-]?key|password|secret|AKIA[0-9A-Z]{16})', text, re.I)),
+    "no_secrets": lambda text: (
+        not bool(re.search(r"(api[_-]?key|password|secret|AKIA[0-9A-Z]{16})", text, re.I))
+    ),
     "valid_frontmatter": lambda text: text.startswith("---") and "---" in text[3:],
 }
 
@@ -93,17 +100,19 @@ def _load_skill_metadata(project_dir: Path) -> list[dict]:
                 content = skill_file.read_text(encoding="utf-8")
                 name = d.name
                 version = "1.0.0"
-                m = re.search(r'skill_id:\s*(\S+)', content)
+                m = re.search(r"skill_id:\s*(\S+)", content)
                 if m:
                     name = m.group(1)
-                m = re.search(r'version:\s*(\S+)', content)
+                m = re.search(r"version:\s*(\S+)", content)
                 if m:
                     version = m.group(1)
-                result.append({
-                    "id": name,
-                    "version": version,
-                    "path": str(skill_file.relative_to(project_dir)),
-                })
+                result.append(
+                    {
+                        "id": name,
+                        "version": version,
+                        "path": str(skill_file.relative_to(project_dir)),
+                    }
+                )
     return result
 
 
@@ -118,12 +127,14 @@ def _load_agent_metadata(project_dir: Path) -> list[dict]:
             content = f.read_text(encoding="utf-8")
             if "internal: true" in content:
                 internal = True
-            result.append({
-                "id": f.stem,
-                "path": str(f.relative_to(project_dir)),
-                "enabled": not internal,
-                "internal": internal,
-            })
+            result.append(
+                {
+                    "id": f.stem,
+                    "path": str(f.relative_to(project_dir)),
+                    "enabled": not internal,
+                    "internal": internal,
+                }
+            )
     return result
 
 
@@ -166,7 +177,10 @@ def forge_init(
     proj = Path(project_dir).resolve() if project_dir else _get_project_dir()
 
     if tui not in SUPPORTED_TUIS:
-        return {"status": "error", "error": f"Unsupported TUI: {tui}. Must be one of {SUPPORTED_TUIS}"}
+        return {
+            "status": "error",
+            "error": f"Unsupported TUI: {tui}. Must be one of {SUPPORTED_TUIS}",
+        }
 
     if not proj.exists():
         return {"status": "error", "error": f"Project directory not found: {proj}"}
@@ -179,7 +193,10 @@ def forge_init(
     # Check for existing forgeweave init
     registry_path = proj / ".forge" / "command_registry.json"
     if registry_path.exists() and not overwrite:
-        return {"status": "error", "error": "ForgeWeave already initialized. Set overwrite=true to reinitialize."}
+        return {
+            "status": "error",
+            "error": "ForgeWeave already initialized. Set overwrite=true to reinitialize.",
+        }
 
     files_created = []
 
@@ -263,7 +280,9 @@ def forge_execute_command(
             result = _route_to_tool(tool_name, args, context, job)
         elif handler == "skill":
             skill_name = entry.get("skill", "")
-            result = _execute_skill_internal(proj, db_path, skill_name, {"args": args, "context": context})
+            result = _execute_skill_internal(
+                proj, db_path, skill_name, {"args": args, "context": context}
+            )
         elif handler == "bash":
             script = entry.get("script", "")
             proc = subprocess.run(
@@ -288,7 +307,9 @@ def forge_execute_command(
         result = {"error": str(e)}
 
     # ── Hook: post_command ──
-    fdb.add_trace(db_path, job, "post_command", {"command": cmd_name, "status": result.get("status", "ok")})
+    fdb.add_trace(
+        db_path, job, "post_command", {"command": cmd_name, "status": result.get("status", "ok")}
+    )
 
     return {
         "status": "ok" if "error" not in result else "error",
@@ -400,7 +421,11 @@ def _execute_skill_internal(proj: Path, db_path: Path, skill: str, params: dict)
     # Find scripts in the skill's scripts/ directory
     scripts_dir = skill_dir / "scripts"
     if not scripts_dir.exists() or not any(scripts_dir.iterdir()):
-        return {"status": "ok", "message": f"Skill '{skill}' has no scripts. SKILL.md loaded.", "artifacts": []}
+        return {
+            "status": "ok",
+            "message": f"Skill '{skill}' has no scripts. SKILL.md loaded.",
+            "artifacts": [],
+        }
 
     artifacts = []
     last_output = {}
@@ -470,8 +495,11 @@ def forge_create_agent(
     agents_dir.mkdir(exist_ok=True)
 
     # Validate agent_id
-    if not re.match(r'^[a-z][a-z0-9-]*$', agent_id):
-        return {"status": "error", "error": "agent_id must be kebab-case (lowercase letters, numbers, hyphens)"}
+    if not re.match(r"^[a-z][a-z0-9-]*$", agent_id):
+        return {
+            "status": "error",
+            "error": "agent_id must be kebab-case (lowercase letters, numbers, hyphens)",
+        }
 
     # Check for duplicate
     for f in agents_dir.iterdir():
@@ -491,8 +519,8 @@ description: "{role}"
 mode: subagent
 internal: false
 temperature: {temperature}
-tools: [{', '.join(tools_list)}]
-skills: [{', '.join(skills_list)}]
+tools: [{", ".join(tools_list)}]
+skills: [{", ".join(skills_list)}]
 constraints: >
   {constraints}
 """
@@ -567,9 +595,16 @@ def forge_research(
     if not topic or len(topic.strip()) < 10:
         return {"status": "error", "error": "Topic too vague. Provide at least 10 characters."}
 
-    job_id = fdb.create_job(db_path, "research", {
-        "topic": topic, "depth": depth, "focus": focus, "max_sources": max_sources,
-    })
+    job_id = fdb.create_job(
+        db_path,
+        "research",
+        {
+            "topic": topic,
+            "depth": depth,
+            "focus": focus,
+            "max_sources": max_sources,
+        },
+    )
 
     fdb.add_trace(db_path, job_id, "pre_research", {"topic": topic})
 
@@ -579,7 +614,9 @@ def forge_research(
     # Run pipeline in background thread so the tool call returns immediately
     def _run():
         try:
-            fdb.update_job(db_path, job_id, stage="plan", progress_pct=5, message="Planning research...")
+            fdb.update_job(
+                db_path, job_id, stage="plan", progress_pct=5, message="Planning research..."
+            )
             summary = run_pipeline(
                 topic=topic,
                 project_dir=proj,
@@ -629,10 +666,14 @@ def forge_search(
         source_filter: Comma-separated domain whitelist.
     """
     import httpx
-    from forgeweave.research_mcp.scraper import extract_main_content, fetch_page
+    from forgeweave.research_mcp.scraper import extract_main_content, fetch_page, parse_html
 
     if not query or len(query.strip()) < 5:
-        return {"status": "error", "query": query, "error": "Query too short. Provide at least 5 characters."}
+        return {
+            "status": "error",
+            "query": query,
+            "error": "Query too short. Provide at least 5 characters.",
+        }
 
     # Use search APIs if available, otherwise fallback to direct URL
     domains = [d.strip() for d in source_filter.split(",") if d.strip()] if source_filter else []
@@ -644,7 +685,9 @@ def forge_search(
     }
 
     async def _search():
-        async with httpx.AsyncClient(headers=headers, timeout=15.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            headers=headers, timeout=15.0, follow_redirects=True
+        ) as client:
             # Try crawling suggested source URLs first
             for domain in domains[:max_results]:
                 url = f"https://{domain}"
@@ -653,12 +696,14 @@ def forge_search(
                     if html:
                         content = extract_main_content(html, url)
                         if content and content.text:
-                            results.append({
-                                "url": url,
-                                "title": content.title or url,
-                                "snippet": content.text[:300],
-                                "source": domain,
-                            })
+                            results.append(
+                                {
+                                    "url": url,
+                                    "title": content.title or url,
+                                    "snippet": content.text[:300],
+                                    "source": domain,
+                                }
+                            )
                 except Exception:
                     pass
 
@@ -677,12 +722,14 @@ def forge_search(
                                 href = link.get("href", "")
                                 text = link.get_text(strip=True)
                                 if text and len(text) > 20:
-                                    results.append({
-                                        "url": href,
-                                        "title": text[:100],
-                                        "snippet": text[:200],
-                                        "source": "web",
-                                    })
+                                    results.append(
+                                        {
+                                            "url": href,
+                                            "title": text[:100],
+                                            "snippet": text[:200],
+                                            "source": "web",
+                                        }
+                                    )
                     except Exception:
                         pass
                     if results:
@@ -788,11 +835,13 @@ def forge_validate(
                 "no_secrets": f"No secrets detected: {passed}",
                 "valid_frontmatter": f"Valid frontmatter: {passed}",
             }
-            checks.append({
-                "rule": rule_id,
-                "passed": passed,
-                "details": detail_map.get(rule_id, f"Check {'passed' if passed else 'failed'}"),
-            })
+            checks.append(
+                {
+                    "rule": rule_id,
+                    "passed": passed,
+                    "details": detail_map.get(rule_id, f"Check {'passed' if passed else 'failed'}"),
+                }
+            )
         except Exception as e:
             checks.append({"rule": rule_id, "passed": False, "details": str(e)})
 
@@ -834,7 +883,7 @@ def forge_memory_write(
 
     try:
         parsed_value = json.loads(value) if isinstance(value, str) else value
-    except (json.JSONDecodeError, TypeError):
+    except json.JSONDecodeError, TypeError:
         parsed_value = value
 
     result = fdb.memory_write(db_path, key, parsed_value, namespace, ttl_seconds)
@@ -949,18 +998,58 @@ def forge_capabilities(project_dir: str = "") -> dict:
         project_dir: Optional project directory for project-specific capabilities.
     """
     tools = [
-        {"name": "forge.init", "description": "Initialize ForgeWeave in a project", "category": "setup"},
-        {"name": "forge.execute_command", "description": "Route /forge-* commands", "category": "execution"},
-        {"name": "forge.execute_skill", "description": "Execute a skill by name", "category": "execution"},
-        {"name": "forge.create_agent", "description": "Create agent definition file", "category": "generation"},
-        {"name": "forge.research", "description": "Full deep-research pipeline", "category": "research"},
+        {
+            "name": "forge.init",
+            "description": "Initialize ForgeWeave in a project",
+            "category": "setup",
+        },
+        {
+            "name": "forge.execute_command",
+            "description": "Route /forge-* commands",
+            "category": "execution",
+        },
+        {
+            "name": "forge.execute_skill",
+            "description": "Execute a skill by name",
+            "category": "execution",
+        },
+        {
+            "name": "forge.create_agent",
+            "description": "Create agent definition file",
+            "category": "generation",
+        },
+        {
+            "name": "forge.research",
+            "description": "Full deep-research pipeline",
+            "category": "research",
+        },
         {"name": "forge.search", "description": "Lightweight web lookup", "category": "research"},
-        {"name": "forge.load_context", "description": "Load project state snapshot", "category": "context"},
-        {"name": "forge.validate", "description": "Validate outputs against rules", "category": "quality"},
-        {"name": "forge.memory_read", "description": "Read from persistent memory", "category": "memory"},
-        {"name": "forge.memory_write", "description": "Write to persistent memory", "category": "memory"},
+        {
+            "name": "forge.load_context",
+            "description": "Load project state snapshot",
+            "category": "context",
+        },
+        {
+            "name": "forge.validate",
+            "description": "Validate outputs against rules",
+            "category": "quality",
+        },
+        {
+            "name": "forge.memory_read",
+            "description": "Read from persistent memory",
+            "category": "memory",
+        },
+        {
+            "name": "forge.memory_write",
+            "description": "Write to persistent memory",
+            "category": "memory",
+        },
         {"name": "forge.status", "description": "Poll job status", "category": "meta"},
-        {"name": "forge.capabilities", "description": "List available tools and skills", "category": "meta"},
+        {
+            "name": "forge.capabilities",
+            "description": "List available tools and skills",
+            "category": "meta",
+        },
     ]
 
     result = {

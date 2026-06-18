@@ -1,4 +1,5 @@
 """Execute a multi-step pipeline from a pipeline definition."""
+
 import argparse
 import json
 import sys
@@ -26,6 +27,7 @@ def execute_step(step: dict, context: dict) -> dict:
 
     if step_type == "script":
         import subprocess
+
         try:
             r = subprocess.run(action, shell=True, capture_output=True, text=True)
             result["output"] = r.stdout
@@ -72,7 +74,13 @@ def main():
     for step in pipeline.get("steps", []):
         result = execute_step(step, context)
         context["results"].append(result)
-        icon = "✓" if result["status"] == "success" else "→" if result["status"] == "delegated" else "✗"
+        icon = (
+            "✓"
+            if result["status"] == "success"
+            else "→"
+            if result["status"] == "delegated"
+            else "✗"
+        )
         print(f"  [{icon}] {result['step']}: {result['status']}")
         if result["output"]:
             print(f"          {str(result['output'])[:200]}")

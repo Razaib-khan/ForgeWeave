@@ -4,6 +4,7 @@
 Loads context, validates command exists in registry, prepares environment.
 Exit 0 = allow, Exit 2 = block with stderr.
 """
+
 import sys
 import json
 from pathlib import Path
@@ -20,7 +21,12 @@ def main():
     # Verify command exists in registry
     registry_path = Path(".forge/command_registry.json")
     if not registry_path.exists():
-        print(json.dumps({"decision": "block", "reason": "Forge not initialized — run forge.init first"}), file=sys.stderr)
+        print(
+            json.dumps(
+                {"decision": "block", "reason": "Forge not initialized — run forge.init first"}
+            ),
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     with open(registry_path) as f:
@@ -29,7 +35,15 @@ def main():
     cmd_name = command.split()[0].lstrip("/")
     if cmd_name not in registry.get("commands", {}):
         available = list(registry.get("commands", {}).keys())
-        print(json.dumps({"decision": "block", "reason": f"Unknown command: {cmd_name}. Available: {available}"}), file=sys.stderr)
+        print(
+            json.dumps(
+                {
+                    "decision": "block",
+                    "reason": f"Unknown command: {cmd_name}. Available: {available}",
+                }
+            ),
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     print(json.dumps({"decision": "approve"}))

@@ -44,7 +44,9 @@ def validate_skill(path: Path) -> list[str]:
     dir_name = path.name
     skill_id_match = re.search(r"skill_id:\s*(\S+)", frontmatter)
     if skill_id_match and skill_id_match.group(1) != dir_name:
-        errors.append(f"Directory name '{dir_name}' does not match skill_id '{skill_id_match.group(1)}'")
+        errors.append(
+            f"Directory name '{dir_name}' does not match skill_id '{skill_id_match.group(1)}'"
+        )
 
     # Required sections in order
     required_sections = [
