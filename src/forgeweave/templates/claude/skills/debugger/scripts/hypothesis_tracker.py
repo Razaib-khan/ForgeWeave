@@ -1,4 +1,5 @@
 """Track debugging hypotheses and narrow down root cause."""
+
 import argparse
 import json
 from datetime import datetime
@@ -40,9 +41,13 @@ def main():
     parser = argparse.ArgumentParser(description="Debugging hypothesis tracker")
     parser.add_argument("symptom", nargs="?", help="The bug symptom")
     parser.add_argument("--session", type=Path, help="Existing session file to continue")
-    parser.add_argument("--add-hypothesis", nargs=2, metavar=("DESC", "TEST"), help="Add hypothesis")
+    parser.add_argument(
+        "--add-hypothesis", nargs=2, metavar=("DESC", "TEST"), help="Add hypothesis"
+    )
     parser.add_argument("--eliminate", type=int, metavar="ID", help="Eliminate hypothesis by ID")
-    parser.add_argument("--save", type=Path, default=Path("debug-session.json"), help="Session file")
+    parser.add_argument(
+        "--save", type=Path, default=Path("debug-session.json"), help="Session file"
+    )
     args = parser.parse_args()
 
     if args.session and args.session.exists():

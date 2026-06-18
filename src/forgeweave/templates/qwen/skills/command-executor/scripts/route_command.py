@@ -1,4 +1,5 @@
 """Route a /forge-* command to its registered skill pipeline."""
+
 import argparse
 import json
 from pathlib import Path
@@ -11,7 +12,12 @@ DEFAULT_REGISTRY = {
     "forge-research": {
         "skill": "deep-research",
         "pipeline": ["deep-research"],
-        "subagents": ["research-planner", "research-agent", "research-validator", "research-synthesizer"],
+        "subagents": [
+            "research-planner",
+            "research-agent",
+            "research-validator",
+            "research-synthesizer",
+        ],
     },
     "forge-docs": {"skill": "code-builder", "pipeline": ["code-builder"]},
     "forge-plan": {"skill": "planner", "pipeline": ["planner"]},
@@ -56,6 +62,7 @@ def main():
     else:
         print(f"Command '{args.command}' not found. Use --list to see available commands.")
         import sys
+
         sys.exit(1)
 
 

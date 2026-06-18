@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Claude native hook — loads project memory on session start."""
+
 import sys
 import json
 from datetime import datetime

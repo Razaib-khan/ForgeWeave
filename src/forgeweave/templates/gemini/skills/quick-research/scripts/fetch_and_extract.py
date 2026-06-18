@@ -1,14 +1,15 @@
 """Fetch a URL and extract clean text content."""
+
 import argparse
 import re
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
 
 
 def fetch_url(url: str, timeout: int = 15) -> tuple[str | None, str | None]:
     try:
         import httpx
+
         resp = httpx.get(url, timeout=timeout, follow_redirects=True)
         resp.raise_for_status()
         return resp.text, None
@@ -21,6 +22,7 @@ def fetch_url(url: str, timeout: int = 15) -> tuple[str | None, str | None]:
 def extract_text(html: str) -> str:
     try:
         import trafilatura
+
         text = trafilatura.extract(html)
         return text or "<!-- extract failed -->"
     except ImportError:

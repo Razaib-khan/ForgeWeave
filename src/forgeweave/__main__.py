@@ -1,4 +1,5 @@
 """ForgeWeave MCP Server — run with: python -m forge_mcp.server [--verbose]"""
+
 import sys
 from forgeweave.server import main
 

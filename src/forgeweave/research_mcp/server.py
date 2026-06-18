@@ -13,16 +13,19 @@ from pathlib import Path
 from fastmcp import FastMCP
 
 from forgeweave.research_mcp.browser import browser_scrape, browser_screenshot
-from forgeweave.research_mcp.cache import cache_stats, cached_fetch
+from forgeweave.research_mcp.cache import cache_stats
 from forgeweave.research_mcp.crawler import Crawler
 from forgeweave.research_mcp.documents import extract_document
-from forgeweave.research_mcp.models import ExtractedContent, DocumentMetadata, ResearchReport, ResearchSummary
+from forgeweave.research_mcp.models import (
+    ExtractedContent,
+    DocumentMetadata,
+    ResearchReport,
+    ResearchSummary,
+)
 from forgeweave.research_mcp.scraper import extract_main_content, fetch_page, parse_html
 from forgeweave.research_mcp.vectors import (
     collection_stats,
-    delete_documents,
     index_document,
-    index_documents,
     search_documents,
     warmup,
 )
@@ -52,6 +55,7 @@ async def research_single_source(url: str, mode: str = "main_text") -> Extracted
         mode: Extraction mode — 'main_text' (clean article), 'full_html', 'links', or 'tables'.
     """
     import httpx
+
     log.info(f"Fetching single source: {url} (mode={mode})")
     headers = {
         "User-Agent": "ResearchBot/1.0",
@@ -74,6 +78,7 @@ async def research_single_source(url: str, mode: str = "main_text") -> Extracted
     soup = parse_html(html)
     if mode == "links":
         from urllib.parse import urljoin
+
         links = [urljoin(url, a["href"]) for a in soup.find_all("a", href=True)]
         log.info(f"Found {len(links)} links on {url}")
         return ExtractedContent(url=url, text="\n".join(links))
@@ -108,7 +113,7 @@ async def research_crawl_urls(
         raw_results = await crawler.crawl_many(urls)
 
     ok_count = sum(1 for v in raw_results.values() if not v.startswith("ERROR"))
-    log.info(f"Crawl complete — {ok_count}/{len(urls)} OK, {len(urls)-ok_count} failed")
+    log.info(f"Crawl complete — {ok_count}/{len(urls)} OK, {len(urls) - ok_count} failed")
 
     report_lines = [f"Crawled {len(urls)} URLs ({len(raw_results)} results):"]
     for url, content in raw_results.items():
@@ -208,6 +213,7 @@ async def research_index_latest(
         date: Optional date string (YYYY-MM-DD).
     """
     import httpx
+
     log.info(f"Indexing: {url}")
     headers = {
         "User-Agent": "ResearchBot/1.0",
@@ -302,13 +308,15 @@ async def research_synthesize(
     sources_meta = []
     for r in results:
         meta = r.get("metadata", {}) or {}
-        sources_meta.append(DocumentMetadata(
-            doc_id=r.get("doc_id", ""),
-            url=meta.get("url", ""),
-            title=meta.get("title", "untitled"),
-            source=meta.get("source", ""),
-            text_preview=r.get("text", "")[:1000],
-        ))
+        sources_meta.append(
+            DocumentMetadata(
+                doc_id=r.get("doc_id", ""),
+                url=meta.get("url", ""),
+                title=meta.get("title", "untitled"),
+                source=meta.get("source", ""),
+                text_preview=r.get("text", "")[:1000],
+            )
+        )
 
     log.info(f"Gathered {len(sources_meta)} sources for synthesis")
     return ResearchReport(
@@ -344,10 +352,16 @@ async def research_deep_research(
         max_concurrency: Maximum concurrent requests (default 3).
         rate_limit: Minimum seconds between requests per domain (default 1.5).
     """
-    log.warning(f"[DEPRECATED] research_deep_research called for '{topic}'. Use forge.research instead.")
+    log.warning(
+        f"[DEPRECATED] research_deep_research called for '{topic}'. Use forge.research instead."
+    )
     if not urls:
-        return {"status": "deprecated", "message": "This tool is deprecated. Use forge.research (from forge-mcp server) for all research needs.", "replacement": "forge.research"}
-    log.info(f"=== DEEP RESEARCH STARTED ===")
+        return {
+            "status": "deprecated",
+            "message": "This tool is deprecated. Use forge.research (from forge-mcp server) for all research needs.",
+            "replacement": "forge.research",
+        }
+    log.info("=== DEEP RESEARCH STARTED ===")
     log.info(f"Topic: {topic}")
     log.info(f"Seed URLs: {len(urls)}")
     log.info(f"Concurrency: {max_concurrency}, Rate limit: {rate_limit}s")
@@ -361,7 +375,9 @@ async def research_deep_research(
     for url, raw_html in raw_results.items():
         if raw_html.startswith("ERROR"):
             log.warning(f"  FAILED: {url} — {raw_html}")
-            all_content.append({"url": url, "title": "", "text": "", "error": raw_html, "source": ""})
+            all_content.append(
+                {"url": url, "title": "", "text": "", "error": raw_html, "source": ""}
+            )
             continue
 
         content = extract_main_content(raw_html, url)
@@ -376,22 +392,26 @@ async def research_deep_research(
                 source=source,
                 date=content.date or "",
             )
-            all_content.append({
-                "url": url,
-                "title": title,
-                "text": content.text,
-                "error": None,
-                "source": source,
-            })
+            all_content.append(
+                {
+                    "url": url,
+                    "title": title,
+                    "text": content.text,
+                    "error": None,
+                    "source": source,
+                }
+            )
         else:
             log.warning(f"  NO CONTENT: {url}")
-            all_content.append({"url": url, "title": "", "text": "", "error": "extraction failed", "source": ""})
+            all_content.append(
+                {"url": url, "title": "", "text": "", "error": "extraction failed", "source": ""}
+            )
 
     total_chars = sum(len(c["text"]) for c in all_content)
     indexed_count = sum(1 for c in all_content if c["text"])
     failed_count = sum(1 for c in all_content if c["error"])
 
-    log.info(f"Phase 2: Complete")
+    log.info("Phase 2: Complete")
     log.info(f"  Total URLs: {len(urls)}")
     log.info(f"  Successfully indexed: {indexed_count}")
     log.info(f"  Failed: {failed_count}")
@@ -411,7 +431,7 @@ async def research_deep_research(
         for c in all_content
     ]
 
-    log.info(f"=== DEEP RESEARCH COMPLETE ===")
+    log.info("=== DEEP RESEARCH COMPLETE ===")
 
     return ResearchReport(
         query=topic,
@@ -448,6 +468,7 @@ async def research_vector_stats() -> str:
 async def research_clear_cache() -> str:
     """Clear HTTP and LLM caches to force fresh fetches and recomputation."""
     from forgeweave.research_mcp.cache import http_cache, llm_cache
+
     http_count = len(http_cache)
     llm_count = len(llm_cache)
     http_cache.clear()

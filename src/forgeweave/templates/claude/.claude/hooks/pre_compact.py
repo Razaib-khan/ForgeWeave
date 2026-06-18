@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave pre_compact hook — preserves critical context before compaction."""
+
 import sys
 import json
 from datetime import datetime

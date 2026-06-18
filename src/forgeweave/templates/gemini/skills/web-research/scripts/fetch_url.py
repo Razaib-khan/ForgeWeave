@@ -1,4 +1,5 @@
 """Fetch a URL with automatic Playwright fallback when HTTP fails."""
+
 import argparse
 import sys
 from pathlib import Path
@@ -7,9 +8,15 @@ from pathlib import Path
 def fetch_http(url: str, timeout: int = 15) -> tuple[str | None, str | None]:
     try:
         import httpx
-        resp = httpx.get(url, timeout=timeout, follow_redirects=True, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; ForgeWeave/1.0)",
-        })
+
+        resp = httpx.get(
+            url,
+            timeout=timeout,
+            follow_redirects=True,
+            headers={
+                "User-Agent": "Mozilla/5.0 (compatible; ForgeWeave/1.0)",
+            },
+        )
         resp.raise_for_status()
         text = resp.text
         if len(text) < 2000:
@@ -24,6 +31,7 @@ def fetch_http(url: str, timeout: int = 15) -> tuple[str | None, str | None]:
 def fetch_playwright(url: str) -> tuple[str | None, str | None]:
     try:
         from playwright.sync_api import sync_playwright
+
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
@@ -40,10 +48,12 @@ def fetch_playwright(url: str) -> tuple[str | None, str | None]:
 def extract_text(html: str) -> str:
     try:
         import trafilatura
+
         text = trafilatura.extract(html)
         return text or html[:5000]
     except ImportError:
         import re
+
         return re.sub(r"<[^>]+>", " ", html)[:5000]
 
 

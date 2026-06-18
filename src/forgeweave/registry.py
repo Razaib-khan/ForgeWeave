@@ -5,6 +5,7 @@ Handlers can be:
   - "skill": routes to forge.execute_skill
   - "bash": runs a shell command
 """
+
 import json
 from pathlib import Path
 

@@ -27,6 +27,7 @@ async def browser_scrape(url: str, screenshot: bool = False, timeout: int = 3000
             if screenshot:
                 screenshot_bytes = await page.screenshot(full_page=True, type="png")
                 import base64
+
                 base64_screenshot = base64.b64encode(screenshot_bytes).decode()
 
             return {
@@ -50,6 +51,7 @@ async def browser_screenshot(url: str, timeout: int = 30000) -> dict:
             await page.goto(url, wait_until="networkidle", timeout=timeout)
             screenshot_bytes = await page.screenshot(full_page=True, type="png")
             import base64
+
             return {
                 "url": url,
                 "screenshot_base64": base64.b64encode(screenshot_bytes).decode(),

@@ -1,4 +1,5 @@
 """Scan project structure and identify ForgeWeave components."""
+
 import argparse
 from pathlib import Path
 

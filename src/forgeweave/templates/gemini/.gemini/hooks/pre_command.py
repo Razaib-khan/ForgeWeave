@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Gemini hook: pre-command validation for /forge-* commands."""
+
 import sys
 import json
 from pathlib import Path
+
 
 def main():
     data = json.loads(sys.stdin.read())
@@ -23,6 +25,7 @@ def main():
 
     print(json.dumps({"decision": "allow"}))
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Gemini hook: protect sensitive paths before file writes."""
+
 import sys
 import json
 
 PROTECTED = [".gemini/settings.json", ".forge/", "AGENTS.md", ".env"]
+
 
 def main():
     data = json.loads(sys.stdin.read())
@@ -14,6 +16,7 @@ def main():
             sys.exit(0)
     print(json.dumps({"decision": "allow"}))
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave research_complete hook — triggers final synthesis, marks job done."""
+
 import sys
 import json
 from datetime import datetime

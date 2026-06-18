@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Claude native hook — logs all tool usage post-execution."""
+
 import sys
 import json
 from datetime import datetime

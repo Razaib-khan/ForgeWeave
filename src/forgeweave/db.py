@@ -5,10 +5,10 @@ Three tables:
   - memory: key/value persistent store with TTL
   - traces: execution trace events
 """
+
 import json
 import sqlite3
 import threading
-import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
@@ -133,9 +133,7 @@ def update_job(
 
 def get_job(db_path: Path, job_id: str) -> dict | None:
     conn = _get_conn(db_path)
-    row = conn.execute(
-        "SELECT * FROM jobs WHERE job_id = ?", (job_id,)
-    ).fetchone()
+    row = conn.execute("SELECT * FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
     if row is None:
         return None
     result = dict(row)
@@ -157,9 +155,7 @@ def add_trace(db_path: Path, job_id: str, event_type: str, event_data: dict | No
 
 def get_traces(db_path: Path, job_id: str) -> list[dict]:
     conn = _get_conn(db_path)
-    rows = conn.execute(
-        "SELECT * FROM traces WHERE job_id = ? ORDER BY id", (job_id,)
-    ).fetchall()
+    rows = conn.execute("SELECT * FROM traces WHERE job_id = ? ORDER BY id", (job_id,)).fetchall()
     result = []
     for row in rows:
         d = dict(row)

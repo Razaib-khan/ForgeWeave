@@ -1,4 +1,5 @@
 """Check research markdown for source traceability and structure."""
+
 import argparse
 import re
 import sys
@@ -26,7 +27,7 @@ def check_file(file_path: Path) -> dict:
     code_blocks = re.findall(r"```(\w*)\n", content)
     for i, lang in enumerate(code_blocks):
         if not lang:
-            issues.append(f"Code block {i+1} missing language annotation")
+            issues.append(f"Code block {i + 1} missing language annotation")
 
     # Check source URLs
     urls = re.findall(r"https?://[^\s)]+", content)
@@ -60,7 +61,9 @@ def main():
         status = "PASS" if result["pass"] else "FAIL"
         print(f"[{status}] {f.name}")
         if result["pass"]:
-            print(f"       {result['sections']} sections, {result['code_blocks']} code blocks, {result['sources']} sources")
+            print(
+                f"       {result['sections']} sections, {result['code_blocks']} code blocks, {result['sources']} sources"
+            )
         else:
             for issue in result["issues"]:
                 print(f"       ! {issue}")

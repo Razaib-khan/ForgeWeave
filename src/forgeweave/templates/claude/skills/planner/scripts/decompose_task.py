@@ -1,4 +1,5 @@
 """Decompose a task into ordered, actionable steps."""
+
 import argparse
 import json
 from pathlib import Path
@@ -37,7 +38,7 @@ def save_plan(plan: dict, output: Path):
         f"**Complexity:** {plan['complexity']}  \n\n"
         f"## Steps\n"
         + "\n".join(
-            f"{i+1}. **{s.get('action')}**"
+            f"{i + 1}. **{s.get('action')}**"
             + (f" (uses: {', '.join(s.get('tools', []))})" if s.get("tools") else "")
             for i, s in enumerate(plan["steps"])
         )

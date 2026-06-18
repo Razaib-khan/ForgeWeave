@@ -37,7 +37,7 @@ jobs:
         run: ruff format --check .
 
       - name: Run mypy
-        run: mypy forgeweave/
+        run: mypy src/forgeweave/
 
   test:
     name: Test

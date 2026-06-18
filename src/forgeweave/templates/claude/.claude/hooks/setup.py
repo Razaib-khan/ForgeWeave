@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave setup hook — runs on repo init to prepare hook environment."""
+
 import sys
 import json
 import subprocess
@@ -10,7 +11,7 @@ def main():
     """Ensure hook dependencies are available."""
     try:
         subprocess.run(["python3", "--version"], capture_output=True, timeout=5)
-    except (FileNotFoundError, subprocess.TimeoutExpired):
+    except FileNotFoundError, subprocess.TimeoutExpired:
         print("Error: Python 3 required for ForgeWeave hooks", file=sys.stderr)
         sys.exit(1)
 

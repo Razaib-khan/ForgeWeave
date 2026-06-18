@@ -1,4 +1,5 @@
 """Merge validated research files into a structured final report."""
+
 import argparse
 from pathlib import Path
 
@@ -51,6 +52,7 @@ def write_report(sections: dict[str, list[str]], output: Path, topic: str):
     for content_list in sections.values():
         for line in content_list:
             import re
+
             for url in re.findall(r"https?://[^\s)]+", line):
                 all_urls.add(url.rstrip(".").rstrip(")"))
     for url in sorted(all_urls):
@@ -60,7 +62,6 @@ def write_report(sections: dict[str, list[str]], output: Path, topic: str):
 
 
 def main():
-    import re
     parser = argparse.ArgumentParser(description="Synthesize research report")
     parser.add_argument("--input", nargs="+", type=Path, help="Validated research files")
     parser.add_argument("--output", type=Path, required=True, help="Output report path")
@@ -70,7 +71,9 @@ def main():
     if args.input:
         sections = merge_sections(args.input)
     else:
-        validated_dir = args.output.parent / f"{args.output.stem.replace('-report', '-validated')}.md"
+        validated_dir = (
+            args.output.parent / f"{args.output.stem.replace('-report', '-validated')}.md"
+        )
         if validated_dir.exists():
             sections = merge_sections([validated_dir])
         else:

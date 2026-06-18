@@ -1,4 +1,5 @@
 """Scaffold a new skill bundle with SKILL.md skeleton and directory structure."""
+
 import argparse
 from pathlib import Path
 
@@ -70,8 +71,12 @@ def main():
     parser = argparse.ArgumentParser(description="Scaffold a new skill bundle")
     parser.add_argument("skill_id", help="Kebab-case skill ID (e.g., 'my-skill')")
     parser.add_argument("--name", help="Human-readable name (default: same as skill_id)")
-    parser.add_argument("--description", "-d", default="Generated skill", help="One-line description")
-    parser.add_argument("--output", "-o", type=Path, default=Path.cwd(), help="Parent output directory")
+    parser.add_argument(
+        "--description", "-d", default="Generated skill", help="One-line description"
+    )
+    parser.add_argument(
+        "--output", "-o", type=Path, default=Path.cwd(), help="Parent output directory"
+    )
     args = parser.parse_args()
 
     name = args.name or args.skill_id.replace("-", " ").title()
@@ -92,12 +97,12 @@ def main():
     skill_path.write_text(content.strip())
 
     print(f"Skill bundle created at {skill_dir}")
-    print(f"  SKILL.md — edit this with the 10 required sections")
-    print(f"  scripts/ — add automation scripts")
-    print(f"  references/ — add knowledge base docs")
-    print(f"  templates/ — add scaffolding templates")
-    print(f"  examples/ — add worked examples")
-    print(f"  evals/ — add validation tests")
+    print("  SKILL.md — edit this with the 10 required sections")
+    print("  scripts/ — add automation scripts")
+    print("  references/ — add knowledge base docs")
+    print("  templates/ — add scaffolding templates")
+    print("  examples/ — add worked examples")
+    print("  evals/ — add validation tests")
 
 
 if __name__ == "__main__":

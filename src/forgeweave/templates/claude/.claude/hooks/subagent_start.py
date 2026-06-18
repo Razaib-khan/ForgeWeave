@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Claude native hook — logs subagent spawns for traceability."""
+
 import sys
 import json
 from datetime import datetime

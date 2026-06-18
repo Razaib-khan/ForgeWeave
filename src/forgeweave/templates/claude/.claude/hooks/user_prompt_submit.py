@@ -5,9 +5,9 @@ Bridges Claude's hook system to forge-mcp by injecting project context
 before every user prompt is processed. This is the entry point for
 forge.load_context in the Claude TUI.
 """
+
 import sys
 import json
-from datetime import datetime
 from pathlib import Path
 
 

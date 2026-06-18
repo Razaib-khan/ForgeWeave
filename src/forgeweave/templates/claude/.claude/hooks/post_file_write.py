@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave post_file_write hook — formats code, logs change."""
+
 import sys
 import json
 import subprocess
@@ -27,7 +28,7 @@ def main():
     if path.suffix == ".py":
         try:
             subprocess.run(["ruff", "format", str(path)], capture_output=True, timeout=10)
-        except (FileNotFoundError, subprocess.TimeoutExpired):
+        except FileNotFoundError, subprocess.TimeoutExpired:
             pass
 
     print(json.dumps({"decision": "approve"}))

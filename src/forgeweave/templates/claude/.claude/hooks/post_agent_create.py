@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave post_agent_create hook — registers agent in index."""
+
 import sys
 import json
 from datetime import datetime

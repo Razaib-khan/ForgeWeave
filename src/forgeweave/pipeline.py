@@ -6,17 +6,16 @@ This module implements the 5-stage pipeline:
 It imports research_mcp modules directly for data-plane work
 (crawling, scraping, indexing, searching).
 """
+
 import json
 import logging
 import re
-import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from forgeweave.research_mcp.crawler import Crawler
-from forgeweave.research_mcp.scraper import extract_main_content, fetch_page, parse_html
-from forgeweave.research_mcp.vectors import index_document, search_documents
+from forgeweave.research_mcp.scraper import extract_main_content, parse_html
+from forgeweave.research_mcp.vectors import index_document
 
 log = logging.getLogger("forge-mcp.pipeline")
 
@@ -179,11 +178,13 @@ async def _research_subtopic(subtopic: dict, max_sources: int) -> dict:
             source = url.split("/")[2]
             index_document(url=url, title=content.title or url, text=content.text, source=source)
             results["sources"].append({"url": url, "title": content.title or url})
-            results["findings"].append({
-                "source": url,
-                "text": content.text[:2000],
-                "code": _extract_code_blocks(html),
-            })
+            results["findings"].append(
+                {
+                    "source": url,
+                    "text": content.text[:2000],
+                    "code": _extract_code_blocks(html),
+                }
+            )
 
     # Build markdown
     lines = [f"# {subtopic['name']}", ""]

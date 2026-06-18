@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ForgeWeave post_research hook — saves final report, updates memory store."""
+
 import sys
 import json
 from datetime import datetime
