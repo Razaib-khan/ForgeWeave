@@ -1,7 +1,7 @@
 """ForgeWeave CLI — `forge` command entry point.
 
 Usage:
-    forge init --tui <name> [project_dir]
+    forge init [--tui <name>] [project_dir]
     forge doctor
     forge mcp [--verbose]
     forge --version
@@ -19,9 +19,21 @@ def cmd_init(args: argparse.Namespace) -> None:
     # Import here to avoid slow startup when running other commands
     from forgeweave.server import forge_init
 
+    tui = args.tui
+    if not tui:
+        print("Select a TUI:")
+        choices = ["opencode", "claude", "gemini", "qwen"]
+        for i, name in enumerate(choices, 1):
+            print(f"  {i}. {name}")
+        try:
+            sel = input("Enter number (default: 1): ").strip()
+            tui = choices[int(sel) - 1] if sel else "opencode"
+        except (ValueError, IndexError):
+            tui = "opencode"
+
     project_dir = args.project_dir or os.environ.get("FORGE_PROJECT_DIR") or str(Path.cwd())
     result = forge_init(
-        tui=args.tui,
+        tui=tui,
         project_dir=project_dir,
         overwrite=args.overwrite,
     )
@@ -110,9 +122,8 @@ def main() -> None:
     init_p = sub.add_parser("init", help="Initialize ForgeWeave in a project")
     init_p.add_argument(
         "--tui",
-        required=True,
         choices=["opencode", "claude", "gemini", "qwen"],
-        help="Target TUI adapter",
+        help="Target TUI adapter (prompts interactively if omitted)",
     )
     init_p.add_argument(
         "project_dir",

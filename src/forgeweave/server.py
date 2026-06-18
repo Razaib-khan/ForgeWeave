@@ -90,7 +90,10 @@ def _get_templates_dir() -> Path:
 
 
 def _load_skill_metadata(project_dir: Path) -> list[dict]:
-    skills_dir = project_dir / "skills"
+    tui = _get_tui()
+    skills_dir = project_dir / f".{tui}" / "skills"
+    if not skills_dir.exists():
+        skills_dir = project_dir / "skills"
     if not skills_dir.exists():
         return []
     result = []
@@ -118,7 +121,10 @@ def _load_skill_metadata(project_dir: Path) -> list[dict]:
 
 
 def _load_agent_metadata(project_dir: Path) -> list[dict]:
-    agents_dir = project_dir / "agents"
+    tui = _get_tui()
+    agents_dir = project_dir / f".{tui}" / "agents"
+    if not agents_dir.exists():
+        agents_dir = project_dir / "agents"
     if not agents_dir.exists():
         return []
     result = []
@@ -142,16 +148,19 @@ def _load_agent_metadata(project_dir: Path) -> list[dict]:
 def _load_hook_metadata(project_dir: Path) -> list[str]:
     tui = _get_tui()
     hooks_dir = project_dir / f".{tui}" / "hooks"
-    if not hooks_dir.exists():
-        # Try direct path
-        hooks_dir = project_dir / ".forge" / "hooks"
-    if not hooks_dir.exists():
+    if hooks_dir.exists():
+        hooks = []
+        for f in hooks_dir.iterdir():
+            if f.suffix in (".py", ".sh", ".ts", ".js", ".jsonc"):
+                hooks.append(f.stem)
+        return sorted(hooks)
+    hooks_file = project_dir / f".{tui}" / "command-hooks.jsonc"
+    if hooks_file.exists():
+        return ["command-hooks.jsonc"]
+    hooks_dir = project_dir / ".forge" / "hooks"
+    if hooks_dir.exists():
         return []
-    hooks = []
-    for f in hooks_dir.iterdir():
-        if f.suffix in (".py", ".sh", ".ts", ".js", ".jsonc"):
-            hooks.append(f.stem)
-    return sorted(hooks)
+    return []
 
 
 # ═══════════════════════════════════════════════════════════════

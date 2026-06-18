@@ -57,7 +57,7 @@ where = ["src"]
 include = ["forgeweave*"]
 
 [tool.setuptools.package-data]
-"forgeweave" = ["templates/**/*"]
+"forgeweave" = ["templates/**/*", "templates/*/.opencode/**/*", "templates/*/.opencode/*"]
 
 [tool.mypy]
 python_version = "3.14"
