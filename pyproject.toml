@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forgeweave"
-version = "1.0.1"
+version = "1.0.2"
 description = "Framework-agnostic agent orchestration layer — 12 forge.* MCP tools"
 readme = "README.md"
 authors = [

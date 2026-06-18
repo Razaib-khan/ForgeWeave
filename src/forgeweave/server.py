@@ -38,7 +38,7 @@ mcp = FastMCP("ForgeWeave")
 
 # ── Helpers ─────────────────────────────────────────────────────
 
-FORGE_VERSION = "1.0.1"
+FORGE_VERSION = "1.0.2"
 
 SUPPORTED_TUIS = ["opencode", "claude", "gemini", "qwen"]
 
