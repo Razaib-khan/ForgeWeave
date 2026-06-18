@@ -1,0 +1,70 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "TEMPLATE_INSTRUCTIONS.md"
+  ],
+  "permission": {
+    "edit": "ask",
+    "bash": "ask"
+  },
+  "mcp": {
+    "servers": [
+      {
+        "name": "forgeweave",
+        "description": "ForgeWeave Control Plane — 12 forge.* tools",
+        "command": "uv",
+        "args": [
+          "run",
+          "--directory",
+          "${workspaceFolder}/forge-mcp",
+          "python",
+          "-m",
+          "forge_mcp.server"
+        ],
+        "transport": "stdio",
+        "env": {
+          "FORGE_PROJECT_DIR": "${workspaceFolder}",
+          "FORGE_TUI": "opencode"
+        }
+      },
+      {
+        "name": "forgeweave-data",
+        "description": "ForgeWeave Data Plane — 10 research_* tools (used internally)",
+        "command": "uv",
+        "args": [
+          "run",
+          "--directory",
+          "${workspaceFolder}/research-mcp",
+          "python",
+          "-m",
+          "research_mcp.server"
+        ],
+        "transport": "stdio"
+      }
+    ]
+  },
+  "forge_hooks": {
+    "events": {
+      "on_command": {
+        "handler": "forge.execute_command",
+        "subscription": "forge-command-router"
+      },
+      "on_tool_execute": {
+        "handler": "forge.validate",
+        "subscription": "pre-file-write-guard",
+        "matcher": {
+          "tool": "write|edit"
+        }
+      },
+      "on_agent_start": {
+        "handler": "forge.load_context",
+        "subscription": "context-loader"
+      },
+      "on_agent_end": {
+        "handler": "forge.memory_write",
+        "subscription": "session-memory-saver"
+      }
+    }
+  }
+}

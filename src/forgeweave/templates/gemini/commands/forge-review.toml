@@ -1,0 +1,19 @@
+description = "Review staged files for code quality, security, and performance issues"
+prompt = """
+Review the staged changes for:
+- Code quality issues
+- Potential bugs
+- Security vulnerabilities
+- Performance concerns
+- Edge cases and error handling
+
+Format as:
+```
+[CRITICAL] Issue: explanation and fix
+[HIGH] Issue: explanation
+[MEDIUM] Issue: explanation
+[LOW] Suggestion: explanation
+```
+
+Provide specific fixes with code examples.
+"""

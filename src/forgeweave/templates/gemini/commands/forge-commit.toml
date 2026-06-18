@@ -1,0 +1,23 @@
+description = "Generate Conventional Commit message from staged changes"
+prompt = """
+Generate a Conventional Commit message from:
+
+```diff
+!{git diff --staged}
+```
+
+1. Type: feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert
+2. Scope from modified files
+3. Description (50 chars max, imperative mood)
+4. Body explaining what and why (72 char wrap)
+
+Format:
+```
+<type>(<scope>): <description>
+
+<body>
+<footer>
+```
+
+If nothing staged, notify user.
+"""

@@ -1,0 +1,38 @@
+description = "Complete overview of the ForgeWeave framework — read this first"
+prompt = """
+# ForgeWeave Framework Overview
+
+Run `/forge-start` at the beginning of every session.
+
+## What is ForgeWeave?
+Framework-agnostic agent orchestration layer. Ships as `forgeweave` with CLI (`forge`) and TUI templates.
+
+## Architecture
+- `forge-mcp/` — Control Plane: 12 forge.* tools
+- `research-mcp/` — Data Plane: 10 research_* tools (used internally)
+- `Templates/<tui>/` — agents/, commands/, hooks/, skills/
+
+## CLI
+- `forge init --tui <name>` — scaffold project
+- `forge doctor` — check environment
+- `forge mcp` — start ForgeWeave MCP server
+
+## Deep Research
+Run `/forge-research <topic>` which calls `forge.research`. Pipeline stages are internal.
+
+## ForgeWeave Tools
+forge.init, forge.execute_command, forge.execute_skill, forge.create_agent,
+forge.research, forge.search, forge.load_context, forge.validate,
+forge.memory_read, forge.memory_write, forge.status, forge.capabilities
+
+## Hooks
+pre_command, post_command, pre_skill, post_skill, pre_research,
+research_iteration, research_complete, post_research, pre_agent_create,
+post_agent_create, pre_file_write, post_file_write
+
+## Rules
+- Design principle: Expose capabilities. Hide orchestration.
+- Skills in skills/<name>/ with SKILL.md + scripts/ + references/
+- `forge init` copies Templates/<tui>/ → project
+"""
+

@@ -1,0 +1,119 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/user_prompt_submit.py"
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": {
+          "tool_name": "bash"
+        },
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/pre_tool_use.py"
+        ]
+      },
+      {
+        "matcher": {
+          "tool_name": "Write|Edit"
+        },
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/pre_file_write.py"
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/post_tool_use.py",
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/validators/forge_validator.py"
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/post_tool_use_failure.py"
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/subagent_start.py"
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/subagent_stop.py"
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/pre_compact.py"
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/session_start.py"
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/session_end.py"
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/notification.py"
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/stop.py"
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/permission_request.py"
+        ]
+      }
+    ],
+    "Setup": [
+      {
+        "matcher": {},
+        "commands": [
+          "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/setup.py"
+        ]
+      }
+    ]
+  }
+}
