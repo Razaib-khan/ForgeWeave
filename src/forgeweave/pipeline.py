@@ -28,7 +28,7 @@ def slugify(topic: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", topic.lower()).strip("-")
 
 
-def run_pipeline(
+async def run_pipeline(
     topic: str,
     project_dir: Path,
     job_id: str,

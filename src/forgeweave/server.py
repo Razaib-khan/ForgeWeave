@@ -618,15 +618,17 @@ def forge_research(
             fdb.update_job(
                 db_path, job_id, stage="plan", progress_pct=5, message="Planning research..."
             )
-            summary = run_pipeline(
-                topic=topic,
-                project_dir=proj,
-                job_id=job_id,
-                depth=depth,
-                focus=focus,
-                constraints=constraints,
-                max_sources=max_sources,
-                update_status=lambda **kw: fdb.update_job(db_path, job_id, **kw),
+            summary = asyncio.run(
+                run_pipeline(
+                    topic=topic,
+                    project_dir=proj,
+                    job_id=job_id,
+                    depth=depth,
+                    focus=focus,
+                    constraints=constraints,
+                    max_sources=max_sources,
+                    update_status=lambda **kw: fdb.update_job(db_path, job_id, **kw),
+                )
             )
             fdb.update_job(db_path, job_id, status="completed", progress_pct=100, result=summary)
             fdb.add_trace(db_path, job_id, "research_complete", summary)
