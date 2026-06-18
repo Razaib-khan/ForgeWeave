@@ -59,6 +59,13 @@ include = ["forgeweave*"]
 [tool.setuptools.package-data]
 "forgeweave" = ["templates/**/*"]
 
+[tool.mypy]
+python_version = "3.14"
+ignore_missing_imports = true
+exclude = [
+    "src/forgeweave/templates/",
+]
+
 [tool.ruff]
 target-version = "py314"
 line-length = 100
