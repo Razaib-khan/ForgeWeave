@@ -1,0 +1,15 @@
+description = "Generate comprehensive tests for specified file or module"
+prompt = """
+Generate comprehensive tests for {{args}}.
+
+Detect framework from project (Jest, Vitest, pytest).
+
+Include:
+1. Unit tests for all exported functions/classes
+2. Edge case and boundary condition coverage
+3. Mock external dependencies
+4. Integration tests where applicable
+5. Error handling tests
+
+Output test file code ready to copy.
+"""

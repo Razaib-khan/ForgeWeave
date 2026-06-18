@@ -1,0 +1,42 @@
+{
+  "eval_id": "test-valid-bundle",
+  "skill_id": "skill-authoring",
+  "description": "Verify that a properly constructed skill bundle passes validation",
+  "input": {
+    "domain": "file formatting",
+    "use_cases": [
+      "Formatting Python files with ruff",
+      "Checking YAML validity in skill frontmatter"
+    ]
+  },
+  "checks": [
+    {
+      "type": "file_exists",
+      "path": "SKILL.md",
+      "description": "SKILL.md manifest exists"
+    },
+    {
+      "type": "file_exists",
+      "path": "scripts/validate_skill_bundle.py",
+      "description": "Validator script exists in scripts/"
+    },
+    {
+      "type": "file_exists",
+      "path": "assets/eval-template.json",
+      "description": "Eval template exists in assets/"
+    },
+    {
+      "type": "content_match",
+      "path": "SKILL.md",
+      "pattern": "## Purpose",
+      "description": "SKILL.md contains Purpose section"
+    },
+    {
+      "type": "content_match",
+      "path": "SKILL.md",
+      "pattern": "## When to Use",
+      "description": "SKILL.md contains When to Use section"
+    }
+  ],
+  "expected_status": "SUCCESS"
+}

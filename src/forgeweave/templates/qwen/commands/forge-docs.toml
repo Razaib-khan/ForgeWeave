@@ -1,0 +1,24 @@
+description = "Generate or review documentation for the specified file or module"
+prompt = """
+Generate or review documentation for {{args}}.
+
+## Generate (new file)
+- JSDoc/PyDoc for all exported functions, classes, types
+- README section with purpose, API, usage example
+
+## Review (existing file)
+- Accuracy against implementation
+- Completeness (missing params, return types, edge cases)
+- Clarity and readability
+- Outdated docs
+
+Output:
+```
+## {module}
+### {function}
+- Signature: ...
+- Parameters: ...
+- Returns: ...
+- Example: ...
+```
+"""

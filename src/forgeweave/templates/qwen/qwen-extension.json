@@ -1,0 +1,58 @@
+{
+  "name": "forgeweave",
+  "version": "1.0.0",
+  "description": "ForgeWeave framework integration for Qwen Code",
+  "entryPoint": "src/index.ts",
+  "hooks": {
+    "on_agent_start": "hooks/on_agent_start.ts",
+    "on_agent_end": "hooks/on_agent_end.ts",
+    "on_tool_execute": "hooks/on_tool_execute.ts",
+    "on_tool_result": "hooks/on_tool_result.ts",
+    "on_prompt_submit": "hooks/on_prompt_submit.ts",
+    "on_error": "hooks/on_error.ts"
+  },
+  "api": {
+    "hooks": {
+      "on_agent_start": {
+        "description": "Loads forge context before agent starts",
+        "blocking": true
+      },
+      "on_agent_end": {
+        "description": "Saves agent session output to memory",
+        "blocking": false
+      },
+      "on_tool_execute": {
+        "description": "Validates tool execution against forge rules",
+        "blocking": true
+      },
+      "on_tool_result": {
+        "description": "Logs tool results for traceability",
+        "blocking": false
+      },
+      "on_prompt_submit": {
+        "description": "Routes /forge-* commands to forge.execute_command",
+        "blocking": true
+      },
+      "on_error": {
+        "description": "Logs errors with forge context",
+        "blocking": false
+      }
+    }
+  },
+  "forge": {
+    "tools": [
+      "forge.init",
+      "forge.execute_command",
+      "forge.execute_skill",
+      "forge.create_agent",
+      "forge.research",
+      "forge.search",
+      "forge.load_context",
+      "forge.validate",
+      "forge.memory_read",
+      "forge.memory_write",
+      "forge.status",
+      "forge.capabilities"
+    ]
+  }
+}

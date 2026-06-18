@@ -1,0 +1,119 @@
+{
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "bash|execute_command",
+        "hooks": [
+          {
+            "name": "pre-command-guard",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/pre_command.py",
+            "description": "Validates /forge-* commands before execution"
+          }
+        ]
+      },
+      {
+        "matcher": "write_file|replace",
+        "hooks": [
+          {
+            "name": "pre-file-write",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/pre_file_write.py",
+            "description": "Checks protected paths before file writes"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "write_file|replace",
+        "hooks": [
+          {
+            "name": "post-file-write",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/post_file_write.py",
+            "description": "Formats code and logs changes after writes"
+          }
+        ]
+      }
+    ],
+    "BeforeAgent": [
+      {
+        "matcher": {},
+        "hooks": [
+          {
+            "name": "inject-context",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/pre_skill.py",
+            "description": "Loads project context before agent interaction"
+          }
+        ]
+      }
+    ],
+    "BeforeToolSelection": [
+      {
+        "matcher": {},
+        "hooks": [
+          {
+            "name": "forge-tool-filter",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/tool_filter.py",
+            "description": "Prioritizes forge.* tools for forgeweave operations"
+          }
+        ]
+      }
+    ],
+    "AfterModel": [
+      {
+        "matcher": {},
+        "hooks": [
+          {
+            "name": "record-interaction",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/post_tool_use.py",
+            "description": "Records model interactions for traceability"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "matcher": {},
+        "hooks": [
+          {
+            "name": "validate-response",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/post_skill.py",
+            "description": "Validates agent output quality"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": {},
+        "hooks": [
+          {
+            "name": "session-init",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/session_start.py",
+            "description": "Loads project memories on session start"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": {},
+        "hooks": [
+          {
+            "name": "session-save",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/session_end.py",
+            "description": "Saves session state on exit"
+          }
+        ]
+      }
+    ]
+  }
+}
