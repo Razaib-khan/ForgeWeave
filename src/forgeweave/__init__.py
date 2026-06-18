@@ -7,5 +7,5 @@ implementation details and never exposed as separate tools.
 Design principle: Expose capabilities. Hide orchestration.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "ForgeWeave Core"
