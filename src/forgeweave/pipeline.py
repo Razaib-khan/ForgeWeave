@@ -12,6 +12,7 @@ import logging
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from forgeweave.research_mcp.crawler import Crawler
 from forgeweave.research_mcp.scraper import extract_main_content, parse_html
@@ -42,7 +43,7 @@ def run_pipeline(
     research_dir = project_dir / "research"
     research_dir.mkdir(exist_ok=True)
 
-    status = {
+    status: dict[str, Any] = {
         "job_id": job_id,
         "status": "running",
         "stages_completed": [],
@@ -71,7 +72,7 @@ def run_pipeline(
     for i, subtopic in enumerate(plan["subtopics"]):
         pct = 20 + int((i / len(plan["subtopics"])) * 40)
         _progress("research", pct, f"Researching: {subtopic['name']}...")
-        result = _research_subtopic(subtopic, max_sources)
+        result = await _research_subtopic(subtopic, max_sources)
         subtopic_results[subtopic["name"]] = result
         raw_path = raw_dir / f"{slugify(subtopic['name'])}.md"
         raw_path.write_text(result.get("text", "No content extracted."), encoding="utf-8")
@@ -226,7 +227,8 @@ def _validate_research(subtopic_results: dict[str, dict]) -> str:
     deduped = set()
 
     for subtopic, result in subtopic_results.items():
-        lines.append(f"## {subtopic}", "")
+        lines.append(f"## {subtopic}")
+        lines.append("")
         for finding in result.get("findings", []):
             total_claims += 1
             claim_preview = finding["text"][:100]
