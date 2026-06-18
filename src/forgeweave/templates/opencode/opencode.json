@@ -1,25 +1,17 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": [
-    "AGENTS.md"
-  ],
-  "permission": {
-    "edit": "ask",
-    "bash": "ask"
-  },
-  "mcpServers": {
+  "mcp": {
     "forgeweave": {
-      "name": "ForgeWeave",
-      "description": "ForgeWeave Control Plane — 12 forge.* tools",
-      "command": "forge",
-      "args": [
-        "mcp"
-      ],
-      "transport": "stdio",
+      "type": "local",
+      "command": ["forge", "mcp"],
       "env": {
         "FORGE_PROJECT_DIR": "${workspaceFolder}",
         "FORGE_TUI": "opencode"
       }
     }
+  },
+  "permission": {
+    "edit": "ask",
+    "bash": "ask"
   }
 }
