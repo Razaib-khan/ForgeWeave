@@ -2,11 +2,13 @@
 
 **Version:** 1.0
 **Status:** Active
-**Last updated:** 2026
+**Last updated:** 2026-06-22
+
+> **v2 Note:** ForgeWeave 2.0 generates AGENT.md files as TUI-consumed templates. There is no runtime Agent Engine — agents are loaded and executed by the TUI (OpenCode, Claude Code, etc.). This spec defines the canonical format that all AGENT.md files must follow for compatibility across TUIs.
 
 This document defines the canonical format for all ForgeWeave agents. Every agent — core or community-contributed — must conform to this specification.
 
-> **CAUTION:** An agent that does not conform to this spec will not be loaded by the execution engine. Validation is strict by design.
+> **CAUTION:** An agent that does not conform to this spec will not be loaded correctly by TUI agent runners. Validation is strict by design.
 
 ---
 
@@ -420,7 +422,7 @@ These rules govern how agents relate to each other and to the broader system:
 ```mermaid
 flowchart LR
     A["1. Read specs"] --> B["2. Create AGENT.md"]
-    B --> C["3. Run forge validate"]
+    B --> C["3. Validate manually against spec"]
     C --> D["4. Verify skills exist"]
     D --> E["5. Submit PR"]
     E --> F["6. Include tests"]
@@ -428,7 +430,7 @@ flowchart LR
 
 1. Read this entire specification and the [SKILL_SPEC.md](./SKILL_SPEC.md).
 2. Create the agent in the appropriate template directory.
-3. Run `forge validate agent <path/to/AGENT.md>` and confirm it passes.
+3. Validate your AGENT.md manually against the Validation Rules table above. *(A `forge validate` command is planned for a future release.)*
 4. Ensure all skills listed in Invoked Skills exist and pass validation.
 5. Submit a PR following the [CONTRIBUTING.md](./CONTRIBUTING.md) process.
 6. PR must include at least one integration test demonstrating the agent's success and failure paths.

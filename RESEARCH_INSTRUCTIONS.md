@@ -1,29 +1,15 @@
 # Research Instructions
 
-When performing research tasks, use the `deep-research` MCP server tools to gather data, then save all outputs to the `research/` directory.
-
-## Starting the Server
-
-```bash
-forge mcp              # start with normal logging
-forge mcp --verbose    # start with debug logging
-```
+When performing research tasks, use the TUI's built-in web tools (`websearch`, `webfetch`) and Playwright MCP tools (`browser_navigate`, `browser_snapshot`) to gather data, then save all outputs to the `research/` directory.
 
 ## Available Tools
 
 | Tool | Purpose |
 |------|---------|
-| `research_single_source` | Fetch and extract clean content from a single URL |
-| `research_crawl_urls` | Crawl multiple URLs concurrently with rate limiting |
-| `research_browse_js` | Fetch a JavaScript-rendered page with Playwright |
-| `research_screenshot` | Take a full-page screenshot of a URL |
-| `research_extract_document` | Extract text from PDF, DOCX, etc. |
-| `research_index_latest` | Fetch + extract + index a URL into the vector database |
-| `research_search` | Semantic search across indexed documents |
-| `research_synthesize` | Search and return grouped sources for the agent to analyze |
-| `research_deep_research` | **Comprehensive research** — crawls all seed URLs, extracts, indexes, returns structured report |
-| `research_vector_stats` | Show vector database statistics |
-| `research_clear_cache` | Clear HTTP and LLM caches |
+| `websearch` | Search the web for information |
+| `webfetch` | Fetch and extract clean content from a single URL |
+| `browser_navigate` + `browser_snapshot` | Fetch a JavaScript-rendered page with Playwright MCP |
+| `browser_take_screenshot` | Take a full-page screenshot of a URL |
 
 ## Focus: Usage Over Features
 
@@ -46,7 +32,7 @@ Do:
 ## Workflow
 
 1. **Plan** — identify which URLs cover usage docs, API references, and tutorials (not blog posts or changelogs)
-2. **Crawl** — use `research_crawl_urls` or `research_single_source` to collect raw data from usage-focused pages
+2. **Fetch** — use `webfetch` to collect raw data from usage-focused pages (fall back to Playwright MCP for JS-rendered pages)
 3. **Extract code** — pull out all code blocks, API signatures, configuration examples
 4. **Analyze** — synthesize findings into a practical usage guide with patterns and recommendations
 5. **Save** — save as `research/<topic>-<date>.md`
@@ -57,7 +43,7 @@ For complex topics, research should be delegated to a sub-agent via the `task` t
 
 **Progress reporting:** The sub-agent must report progress at each stage via chat messages:
 1. **Starting** — "Research started on [topic]. Planning seed URLs..."
-2. **Crawling** — "Crawling [N] URLs: [url1], [url2], ..."
+2. **Fetching** — "Fetching [N] URLs: [url1], [url2], ..."
 3. **Extracting** — "Extracting code examples and patterns from [N] sources..."
 4. **Synthesizing** — "Synthesizing [N] findings into usage guide..."
 5. **Complete** — "Research complete. Report saved to [path]."

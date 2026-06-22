@@ -1,0 +1,20 @@
+description = "Execute the deep research pipeline via the deep-research skill"
+prompt = """
+Execute deep research for topic: {{args}}
+
+Call the deep-research skill with the topic and options. The pipeline runs internally:
+planner → parallel researchers → validator → synthesizer → structured output.
+
+Do NOT call pipeline stages directly — they are internal implementation details.
+
+## Options
+- `--depth=<quick|standard|deep>` (default: standard)
+- `--focus=<usage|architecture|comparison|general>` (default: usage)
+
+## Rules
+- Sources: official docs, API refs, usage guides ONLY
+- NO blog posts, NO changelogs, NO marketing
+- Every claim needs a traceable source URL
+- Monitor progress
+"""
+

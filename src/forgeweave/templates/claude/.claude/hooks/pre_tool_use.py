@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Claude native hook — routes PreToolUse to ForgeWeave security guard.
 
-Bridges Claude's tool execution events to forge-mcp validation layer.
 Blocks dangerous commands and sensitive file operations.
 """
 

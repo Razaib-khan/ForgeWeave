@@ -23,7 +23,7 @@ def main():
     if not registry_path.exists():
         print(
             json.dumps(
-                {"decision": "block", "reason": "Forge not initialized — run forge.init first"}
+                {"decision": "block", "reason": "Forge not initialized — run forge init --tui <name> first"}
             ),
             file=sys.stderr,
         )

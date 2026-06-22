@@ -1,6 +1,6 @@
 {
   "name": "forgeweave",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "ForgeWeave framework integration for Qwen Code",
   "entryPoint": "src/index.ts",
   "hooks": {
@@ -30,7 +30,7 @@
         "blocking": false
       },
       "on_prompt_submit": {
-        "description": "Routes /forge-* commands to forge.execute_command",
+        "description": "Routes /forge-* commands to TUI command handlers",
         "blocking": true
       },
       "on_error": {
@@ -38,21 +38,5 @@
         "blocking": false
       }
     }
-  },
-  "forge": {
-    "tools": [
-      "forge.init",
-      "forge.execute_command",
-      "forge.execute_skill",
-      "forge.create_agent",
-      "forge.research",
-      "forge.search",
-      "forge.load_context",
-      "forge.validate",
-      "forge.memory_read",
-      "forge.memory_write",
-      "forge.status",
-      "forge.capabilities"
-    ]
   }
 }
