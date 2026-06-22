@@ -1,8 +1,7 @@
-"""ForgeWeave MCP Server — run with: python -m forge_mcp.server [--verbose]"""
+"""ForgeWeave CLI — run `forge --help` for available commands."""
 
 import sys
-from forgeweave.server import main
+from forgeweave.cli import main
 
 if __name__ == "__main__":
-    verbose = "--verbose" in sys.argv or "-v" in sys.argv
-    main(verbose=verbose)
+    main()

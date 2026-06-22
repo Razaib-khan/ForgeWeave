@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Claude native hook — routes UserPromptSubmit to ForgeWeave context loader.
-
-Bridges Claude's hook system to forge-mcp by injecting project context
-before every user prompt is processed. This is the entry point for
-forge.load_context in the Claude TUI.
-"""
+"""Claude native hook — injects project context before every user prompt."""
 
 import sys
 import json
@@ -15,7 +10,7 @@ def main():
     input_data = json.loads(sys.stdin.read())
     prompt = input_data.get("prompt", "")
 
-    # If prompt starts with /forge-, route through forge.execute_command
+    # If prompt starts with /forge-, let the TUI command system handle it
     if prompt.strip().startswith("/forge-"):
         print(json.dumps({"decision": "approve", "context": ""}))
         sys.exit(0)

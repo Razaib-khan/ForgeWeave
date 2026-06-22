@@ -4,19 +4,15 @@ This project uses ForgeWeave — a framework-agnostic agent orchestration layer.
 
 ## Key Principles
 
-- **MCP = thin execution interface** — forge.* tools trigger pipelines, load skills, manage state. They never contain business logic.
+- **AGENTS.md = primary context** — global rules, auto-detection, skills, subagents. Read first.
 - **Skills = logic layer** — SKILL.md + Python scripts + references. Every capability is a skill.
-- **Agents = workers** — Internal pipeline components. Never called directly by the user.
-- **Commands = triggers** — `/forge-*` commands route through `forge.execute_command` to skills/agents.
-
-## Available Tools
-
-All 12 forge.* tools are available via the forge-mcp server. Data-plane tools (research_*) are used internally by skills.
+- **Commands = triggers** — `/forge-*` commands invoke skills or agents directly via TUI-native routing (no MCP server).
+- **Playwright MCP = browser automation** — `browser_navigate`, `browser_snapshot`, etc. for web interaction.
 
 ## Lifecycle
 
 ```
-User prompt → forge.execute_command → pre_command hook → skill/agent → post_command hook → result
+User prompt → read AGENTS.md → load skills → code → build skills → commit
 ```
 
 ## Hooks

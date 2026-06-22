@@ -13,90 +13,67 @@ All notable changes to ForgeWeave are documented in this file.
 
 ---
 
-## How to Update This File
+## [2.0.0] — 2026-06-22
 
-- All contributors **must** update this file in every PR under the `[Unreleased]` section.
-- Use the correct category for your change (see below).
-- Write entries from the **user's perspective**, not the implementer's.
-
-| Good | Bad |
-|---|---|
-| "Skills with malformed output format sections now raise a clear validation error instead of silently skipping" | "Refactored SkillLoader internal parse method" |
-
-### Categories
-
-| Category | When to use |
-|---|---|
-| `Added` | New features, commands, adapters, skills, agents |
-| `Changed` | Changes to existing behavior (non-breaking) |
-| `Deprecated` | Features that will be removed in a future release |
-| `Removed` | Features that have been removed |
-| `Fixed` | Bug fixes |
-| `Security` | Security fixes or hardening changes |
-
----
-
-## [Unreleased]
-
-> Changes that are merged into `dev` but not yet released.
+> Major refactor: removed the custom MCP server (`research_mcp` module) and replaced it with TUI-native scaffolding. ForgeWeave is now a pure scaffolding CLI — **Templates + Rules + Skills. No server.**
 
 ### Added
 
-- Initial project structure and architecture definition (`PROJECT_CONTEXT.md`).
-- Contributor documentation: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`.
-- GitHub issue templates: Bug Report, Feature Proposal, Adapter Request.
-- GitHub PR template with contributor checklist.
-- Skill Specification Standard (`SKILL_SPEC.md`).
-- Agent Specification Standard (`AGENT_SPEC.md`).
-- Adapter Specification Standard (`ADAPTER_SPEC.md`).
-- Project-level agent registration config (`AGENTS.md`).
-- Pre-commit configuration (`.pre-commit-config.yaml`).
+- Interactive MCP server selection via InquirerPy during `forge init`
+- Dynamic AGENTS.md generation — marks selected MCP servers with ✓ and unselected with —
+- 6 MCP server definitions: Playwright (mandatory), Headroom (mandatory), Firecrawl, GitHub, SQLite, Context7
+- 4 TUI adapter templates: OpenCode, Claude Code, Gemini CLI, Qwen Code
+- Per-server skills: `firecrawl-mcp`, `github-mcp`, `sqlite-mcp`, `context7-mcp`, `headroom-mcp`
+- Deep-research skill with MCP auto-detection and automatic skill conversion from findings
+- `forge doctor` command for environment verification
+- Full template directories with agents, commands, hooks, and skills for all 4 TUIs
+
+### Changed
+
+- Removed `research_mcp` module (browser, cache, crawler, documents, models, scraper, vectors, server)
+- Removed `db.py`, `pipeline.py`, `registry.py` modules
+- Simplified core to 4 files: `__init__.py`, `__main__.py`, `cli.py`, `server.py`
+- Templates now use correct TUI directory structure (e.g., `.claude/skills/` instead of `claude/skills/`)
+- Python minimum version raised to 3.14
 
 ### Fixed
 
-- Corrected relative paths in spec documents to point to actual file locations.
-- Fixed `main.py` template path resolution bug.
+- Template path resolution now correctly locates TUI-specific config files
+- Qwen extension config writes to `qwen-extension.json` instead of `qwencode.json`
+- AGENTS.md tables dynamically reflect actually selected MCP servers
 
 ---
 
-## [0.1.0] — TBD
+## [1.0.2] — 2026-06-18
 
-> First public release. Core scaffolding and CLI foundation.
+### Added
 
-| Category | Details |
-|---|---|
-| **CLI** | `forge init` command with interactive TUI selector |
-| **Specs** | SKILL_SPEC.md, AGENT_SPEC.md, ADAPTER_SPEC.md — all v1.0 |
-| **Docs** | CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, PROJECT_CONTEXT.md |
-| **Templates** | `.github/` issue and PR templates |
-| **Infrastructure** | pyproject.toml, uv.lock, .python-version, .pre-commit-config.yaml |
+- GitHub issue and PR templates
+- Pre-commit configuration (ruff, mypy, trailing-whitespace)
+- `PROJECT_CONTEXT.md` with architecture documentation
+- Contributor docs: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`
 
-*(Detailed changelog entries will be populated at first release.)*
+### Fixed
 
----
-
-### Release Checklist for Maintainers
-
-```mermaid
-flowchart TB
-    A["1. Verify all PRs merged to dev"] --> B["2. Run full test suite"]
-    B --> C["3. Update CHANGELOG: [Unreleased] → [x.y.z] - YYYY-MM-DD"]
-    C --> D["4. Reset [Unreleased] to empty"]
-    D --> E["5. Create version tag"]
-    E --> F["6. Push tag & release to PyPI"]
-```
+- Corrected relative paths in spec documents
 
 ---
 
-<!--
-VERSIONING RULES FOR MAINTAINERS:
+## [1.0.1] — 2026-06-15
 
-PATCH (0.1.x): Bug fixes, documentation corrections, test additions.
-MINOR (0.x.0): New features that are backward-compatible (new commands, new adapters, new skills).
-MAJOR (x.0.0): Breaking changes (CLI interface changes, template format changes, adapter API changes).
+### Added
 
-To release:
-1. Move all [Unreleased] entries to a new versioned section with today's date.
-2. Reset [Unreleased] to empty.
-3. Tag the release in Git: git tag -a v0.x.x -m "Release v0.x.x"
--->
+- Agent, Skill, and Adapter specification documents (AGENT_SPEC.md, SKILL_SPEC.md, ADAPTER_SPEC.md)
+- Project-level agent registration config (AGENTS.md)
+- Basic `forge init` CLI command with TUI selector
+- Research MCP module with browser automation, crawling, document processing, and vector embeddings
+
+---
+
+## [1.0.0] — 2026-06-10
+
+### Added
+
+- Initial project structure
+- Python package with setuptools build
+- uv dependency management

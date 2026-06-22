@@ -78,16 +78,16 @@ Each TUI adapter (OpenCode, Claude, Gemini, Qwen) is a strict transformation bou
 
 | Requirement | Minimum Version |
 |---|---|
-| Python | 3.11+ |
+| Python | 3.14+ |
 | pip | 23.0+ |
 | Git | 2.40+ |
-| Virtual environment | `venv` or `poetry` |
+| Virtual environment | `venv` or `uv` |
 
 ### Step-by-step
 
 ```bash
 # 1. Fork the repository on GitHub, then clone your fork
-git clone     https://github.com/Razaib-khan/forgeweave.git
+git clone https://github.com/Razaib-khan/forgeweave.git
 cd forgeweave
 
 # 2. Add the upstream remote
@@ -107,48 +107,35 @@ pre-commit install
 forge doctor
 ```
 
-> **Note:** The `forge doctor` command is not yet implemented. It will verify your environment in a future release.
-
-If `forge doctor` passes all checks, your environment is correctly configured.
-
 ---
 
 ## Project Structure
 
 ```text
 forgeweave/
-├── forgeweave/               # Core Python package
-│   ├── cli/                  # CLI entry points and command routing
-│   ├── adapters/             # TUI-specific transformation layers
-│   │   ├── opencode.py
-│   │   ├── claude.py
-│   │   ├── gemini.py
-│   │   └── qwen.py
-│   ├── skills/               # Skill loading, parsing, validation
-│   ├── agents/               # Agent lifecycle and execution logic
-│   ├── templates/            # Template engine and versioning
-│   ├── hooks/                # Lifecycle hook system (future)
-│   ├── mcp/                  # MCP integration layer (future)
-│   └── core/                 # Shared types, config, constants
-├── templates/                # Static TUI template blueprints
-│   ├── opencode/
-│   ├── claude/
-│   ├── gemini/
-│   └── qwen/
-├── tests/                    # All tests mirror the package structure
-│   ├── unit/
-│   ├── integration/
-│   └── fixtures/
-├── docs/                     # Extended documentation
+├── src/forgeweave/           # Core Python package
+│   ├── __init__.py           # Package metadata, version
+│   ├── __main__.py           # `python -m forgeweave` entry point
+│   ├── cli.py                # CLI: forge init, forge doctor, forge --version
+│   ├── server.py             # Core logic: forge_init(), MCP configs, AGENTS.md processing
+│   └── templates/            # TUI adapter templates (distributed as package data)
+│       ├── opencode/         # OpenCode adapter
+│       ├── claude/           # Claude Code adapter
+│       ├── gemini/           # Gemini CLI adapter
+│       └── qwen/             # Qwen Code adapter
+├── tests/                    # Tests
+│   └── test_imports.py       # Basic import test
 ├── .github/                  # GitHub Actions, issue templates, PR templates
-├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
-├── SECURITY.md
-├── CHANGELOG.md
-├── PROJECT_CONTEXT.md
-├── pyproject.toml
+├── AGENTS.md                 # Project-level agent rules (used by agents at runtime)
+├── *.md                      # Specs and documentation (see below)
+├── pyproject.toml            # Build configuration (setuptools)
 └── README.md
 ```
+
+Each TUI template directory contains:
+- **Config file** — TUI-specific config (opencode.json, settings.json, qwen-extension.json)
+- **AGENTS.md** — TUI-adapted global rules
+- **`.<tui>/`** — Directory with agents, commands, hooks, and skills (20 skills per TUI)
 
 ---
 
@@ -203,7 +190,7 @@ ForgeWeave follows [Conventional Commits](https://www.conventionalcommits.org/en
 
 ### Scope (optional but encouraged)
 
-Use the module name: `cli`, `adapter`, `skills`, `agents`, `templates`, `core`, `mcp`
+Use the module name: `cli`, `server`, `templates`, `docs`
 
 ### Examples
 
@@ -347,19 +334,11 @@ All contributions that touch logic must include tests.
 
 ### Structure
 
-Tests live in `/tests/` and mirror the package structure:
+Tests live in `/tests/`:
 
 ```text
 tests/
-  unit/
-    test_cli.py
-    test_adapters.py
-    test_skills.py
-  integration/
-    test_forge_init.py
-  fixtures/
-    sample_skill.md
-    sample_agent.md
+  test_imports.py
 ```
 
 ### Running Tests

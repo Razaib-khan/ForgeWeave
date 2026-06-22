@@ -1,0 +1,21 @@
+description = "Context launcher — load AGENTS.md for full framework rules"
+prompt = """
+# /forge-start — Context Launcher
+
+> **AGENTS.md is the primary context source.** Read it for full rules. This is a quick-reference.
+
+## Commands
+- `forge init --tui <name>` — scaffold project
+- `forge doctor` — check Python 3.14+, templates
+- `/forge-search <query>` — quick web lookup
+- `/forge-research <topic>` — 6-stage deep research → report + skill
+
+## Key Files
+- `AGENTS.md` — primary context: global rules, auto-detection, skills, subagents
+- `skills/<name>/SKILL.md` — domain expertise
+
+## Standards
+- Python 3.14+
+- Skills follow SKILL.md + scripts/ + references/ + evals/ layout
+"""
+

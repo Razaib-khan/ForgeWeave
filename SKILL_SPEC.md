@@ -2,11 +2,13 @@
 
 **Version:** 1.0
 **Status:** Active
-**Last updated:** 2026
+**Last updated:** 2026-06-22
+
+> **v2 Note:** ForgeWeave 2.0 generates SKILL.md files as TUI-consumed templates. There is no runtime Skill Engine — skills are loaded and invoked by the TUI (OpenCode, Claude Code, etc.). This spec defines the canonical format that all SKILL.md files must follow for compatibility across TUIs.
 
 This document defines the canonical format for all ForgeWeave skills. Every skill — whether built-in, community-contributed, or user-generated — must conform to this specification exactly.
 
-> **CAUTION:** Deviations will cause skill loading to fail at validation time. Validation is strict by design to guarantee determinism.
+> **CAUTION:** Deviations will cause skill loading to fail in TUI runners. Validation is strict by design to guarantee determinism.
 
 ---
 
@@ -349,8 +351,8 @@ graph LR
 ```mermaid
 flowchart LR
     A["1. Read SKILL_SPEC.md"] --> B["2. Create SKILL.md"]
-    B --> C["3. Run forge validate skill"]
-    C --> D{"Validation passes?"}
+    B --> C["3. Validate manually against spec"]
+    C --> D{"Valid?"}
     D -->|Yes| E["4. Submit PR"]
     D -->|No| B
     E --> F["5. Include integration test"]
@@ -358,7 +360,7 @@ flowchart LR
 
 1. Read this entire specification.
 2. Create the skill in the appropriate template directory.
-3. Run `forge validate skill <path/to/SKILL.md>` and confirm it passes.
+3. Validate your SKILL.md manually against the Validation Rules table above. *(A `forge validate` command is planned for a future release.)*
 4. Submit a PR following the [CONTRIBUTING.md](./CONTRIBUTING.md) process.
 5. PR must include at least one integration test that loads and validates the skill.
 

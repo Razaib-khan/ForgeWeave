@@ -1,57 +1,55 @@
 # ForgeWeave
 
-Framework-agnostic agent orchestration layer — **12 forge.\* MCP tools**.
+Agent orchestration framework — project scaffolding, template distribution, and AGENTS.md global rules.
 
 `pip install forgeweave` or `uv add forgeweave`
 
 ## Quick Start
 
 ```bash
-# Initialize a project
+# Initialize a ForgeWeave project
 forge init --tui opencode ./my-project
 cd my-project
-
-# Start the MCP server
-forge mcp
 
 # Check your setup
 forge doctor
 ```
 
+## Architecture
+
+ForgeWeave is a scaffolding tool — **Templates + Rules + Skills. No server.**
+
+```
+forge init    → Copies TUI-specific templates into your project
+              → Configures MCP servers (Playwright, Headroom, Firecrawl, etc.)
+              → Generates AGENTS.md with dynamic MCP availability markers
+forge doctor  → Verifies environment prerequisites
+```
+
+### What `forge init` generates
+
+| Component | Description |
+|---|---|
+| **AGENTS.md** | Global behavioral rules for all coding agents, dynamically marking which MCP servers are available |
+| **Skills** | 20+ domain-specific skill bundles (deep-research, playwright-mcp, skill-builder, etc.) |
+| **Commands** | 8 predefined `/forge-*` commands (forge-start, forge-research, forge-search, etc.) |
+| **Agents** | Worker definitions for autonomous sub-agents (research pipeline, code review, etc.) |
+| **Hooks** | Lifecycle hooks for TUI-native orchestration |
+| **MCP configs** | Pre-configured Playwright (mandatory), Headroom (mandatory), and optional servers (Firecrawl, GitHub, SQLite, Context7) |
+
+### Supported TUIs
+
+- **OpenCode** — `.opencode/` directory, JSON config
+- **Claude Code** — `.claude/` directory, JSON settings
+- **Gemini CLI** — `.gemini/` directory, JSON settings
+- **Qwen Code** — `.qwen/` directory, extension JSON
+
 ## Design
 
-```
-MCP = thin execution interface (12 forge.* tools)
-Skills = logic layer (SKILL.md + scripts)
-Agents = internal workers (never directly invoked)
-Commands = triggers (/forge-* routes through registry)
-```
-
-**Expose capabilities. Hide orchestration.**
-
-## The 12 Tools
-
-| Tool | Purpose |
-|---|---|
-| `forge.init` | Initialize ForgeWeave in a project |
-| `forge.execute_command` | Route /forge-* commands |
-| `forge.execute_skill` | Execute a skill by name |
-| `forge.create_agent` | Create agent definition file |
-| `forge.research` | Full deep-research pipeline |
-| `forge.search` | Lightweight web lookup |
-| `forge.load_context` | Load project state snapshot |
-| `forge.validate` | Validate outputs against rules |
-| `forge.memory_read` | Read from persistent SQLite |
-| `forge.memory_write` | Write to persistent SQLite |
-| `forge.status` | Poll job status |
-| `forge.capabilities` | List available tools and skills |
-
-## Hooks
-
-12 lifecycle hooks: pre/post command, pre/post skill, pre/post research,
-research_iteration, research_complete, pre/post agent_create, pre/post file_write.
-
-Hooks observe, validate, prepare, or finalize — they never contain business logic.
+- **Determinism** — Same input always produces the same output
+- **Template-driven** — All scaffolding comes from versioned templates
+- **No hidden state** — All I/O is declared and logged
+- **Adapters are boundaries** — Business logic never leaks into TUI formats
 
 ## License
 

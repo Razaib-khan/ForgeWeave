@@ -2,7 +2,9 @@
 
 **Version:** 1.0
 **Status:** Active
-**Last updated:** 2026
+**Last updated:** 2026-06-22
+
+> **v2 Note:** ForgeWeave 2.0 does not have a runtime adapter engine or BaseAdapter class. Adapters are implemented as template directories (`src/forgeweave/templates/<tui>/`) with TUI-specific file structures. This spec documents the logical adapter rules that template authors must follow.
 
 This document defines how ForgeWeave TUI adapters must be implemented. Adapters are strict transformation boundaries between the ForgeWeave internal format and TUI-specific formats.
 

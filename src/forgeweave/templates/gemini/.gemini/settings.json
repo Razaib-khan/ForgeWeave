@@ -55,10 +55,10 @@
         "matcher": {},
         "hooks": [
           {
-            "name": "forge-tool-filter",
+            "name": "tool-filter",
             "type": "command",
             "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/tool_filter.py",
-            "description": "Prioritizes forge.* tools for forgeweave operations"
+            "description": "Prioritizes relevant tools for forgeweave operations"
           }
         ]
       }

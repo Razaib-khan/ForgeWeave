@@ -1,11 +1,12 @@
-"""ForgeWeave — Framework-agnostic agent orchestration layer.
+"""ForgeWeave — Agent orchestration framework.
 
-Exposes 12 high-level forge.* tools via MCP that form the execution interface.
-Internal pipeline stages (planner, researchers, validator, synthesizer) are
-implementation details and never exposed as separate tools.
+Provides project scaffolding (forge init), template distribution,
+and AGENTS.md global rules. No custom MCP server — relies on
+Playwright MCP for browser automation and TUI-native features
+(plugins, hooks, subagents) for orchestration.
 
-Design principle: Expose capabilities. Hide orchestration.
+Design principle: Templates + Rules + Skills. No server.
 """
 
-__version__ = "1.0.2"
+__version__ = "2.0.0"
 __author__ = "ForgeWeave Core"

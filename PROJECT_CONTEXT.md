@@ -1,7 +1,7 @@
 # Project Context
 
-**Version:** 1.0
-**Last updated:** 2026-06-15
+**Version:** 2.0
+**Last updated:** 2026-06-22
 **Status:** Active
 
 This document provides high-level architectural context for ForgeWeave. It is the reference for design decisions, supported environments, and project scope.
@@ -14,274 +14,190 @@ This document provides high-level architectural context for ForgeWeave. It is th
 
 - [What is ForgeWeave?](#what-is-forgeweave)
 - [Architecture Overview](#architecture-overview)
-- [Layer Responsibilities](#layer-responsibilities)
+- [Module Responsibilities](#module-responsibilities)
 - [Data Flow](#data-flow)
 - [Supported Environments (TUIs)](#supported-environments-tuis)
+- [MCP Server Framework](#mcp-server-framework)
 - [Design Principles](#design-principles)
 - [Key Specifications](#key-specifications)
 - [Project Status](#project-status)
-- [Roadmap](#roadmap)
 - [Glossary](#glossary)
 
 ---
 
 ## What is ForgeWeave?
 
-ForgeWeave is a **behavioral execution framework for AI agents inside development environments** (TUIs). It is a CLI tool written in Python that:
+ForgeWeave is a **project scaffolding CLI** for AI agent development environments (TUIs). It is written in Python and:
 
-1. **Initializes projects** with TUI-specific agent and skill scaffolding.
-2. **Defines and enforces** strict specifications for Skills and Agents.
-3. **Transforms** internal structures into TUI-specific formats via adapters.
-4. **Enforces** determinism, transparency, and explicit behavior documentation.
+1. **Initializes projects** with TUI-specific agent, command, hook, and skill scaffolding.
+2. **Configures MCP servers** — Playwright and Headroom are mandatory; Firecrawl, GitHub, SQLite, Context7 are optional.
+3. **Generates AGENTS.md** with dynamic markers showing which MCP servers are available.
+4. **Distributes reusable skills** that encode domain expertise for coding agents.
+
+ForgeWeave is **not** a runtime server. It generates files that the TUI consumes.
 
 ---
 
 ## Architecture Overview
 
-```mermaid
-flowchart TB
-    subgraph User["User Space"]
-        U[Developer] -->|CLI commands| CLI
-    end
-
-    subgraph ForgeWeave["ForgeWeave Core"]
-        CLI["CLI Layer<br/>(argparse, command routing)"]
-
-        subgraph Core["Core Layer"]
-            TYPES["Shared Types<br/>ForgeProject, Skill, Agent"]
-            CONFIG["Configuration<br/>Loader & Constants"]
-        end
-
-        subgraph Engine["Execution Engine"]
-            SKILL["Skill Engine<br/>Load · Parse · Validate"]
-            AGENT["Agent Engine<br/>Lifecycle · Execution"]
-            TEMPLATE["Template Engine<br/>Versioning · Rendering"]
-        end
-
-        subgraph Future["Future Layers"]
-            HOOKS["Hook System<br/>(lifecycle hooks)"]
-            MCP["MCP Integration<br/>(tool exposure)"]
-        end
-    end
-
-    subgraph Adapters["Adapter Layer"]
-        direction LR
-        A1["OpenCode<br/>Adapter"]
-        A2["Claude Code<br/>Adapter"]
-        A3["Gemini CLI<br/>Adapter"]
-        A4["Qwen Code<br/>Adapter"]
-    end
-
-    subgraph Output["Generated Output"]
-        O1[".opencode/"]
-        O2[".claude/"]
-        O3[".gemini/"]
-        O4[".qwen/"]
-    end
-
-    CLI --> Core
-    Core --> Engine
-    SKILL --> TEMPLATE
-    AGENT --> TEMPLATE
-    TEMPLATE -.->|future| HOOKS
-    HOOKS -.->|future| MCP
-    TEMPLATE --> Adapters
-    A1 --> O1
-    A2 --> O2
-    A3 --> O3
-    A4 --> O4
-
-    style Future fill:#f0f0f0,stroke:#999,stroke-dasharray: 5 5
-    style HOOKS fill:#f0f0f0,stroke:#999,stroke-dasharray: 5 5
-    style MCP fill:#f0f0f0,stroke:#999,stroke-dasharray: 5 5
 ```
+┌─────────────────────────────────────────┐
+│              forge CLI                   │
+│  ┌─────────────┐  ┌──────────────────┐  │
+│  │ forge init  │  │  forge doctor    │  │
+│  └──────┬──────┘  └──────────────────┘  │
+│         │                                │
+│         ▼                                │
+│  ┌──────────────────────────────────┐    │
+│  │         forgeweave.server        │    │
+│  │  ┌────────────────────────────┐  │    │
+│  │  │  forge_init()              │  │    │
+│  │  │  ├─ Copy templates         │  │    │
+│  │  │  ├─ _apply_mcp_configs()   │  │    │
+│  │  │  └─ _process_agents_md()   │  │    │
+│  │  └────────────────────────────┘  │    │
+│  │  ┌────────────────────────────┐  │    │
+│  │  │  MCP_SERVER_DEFS           │  │    │
+│  │  │  6 servers defined here    │  │    │
+│  │  └────────────────────────────┘  │    │
+│  └──────────────────────────────────┘    │
+└─────────────────────────────────────────┘
+          │                      │
+          ▼                      ▼
+┌──────────────────┐   ┌──────────────────┐
+│  TUI Config File  │   │   AGENTS.md      │
+│  (JSON/YAML)      │   │   (dynamic ✓/—)  │
+│  MCP server defs  │   │   tool docs      │
+└──────────────────┘   └──────────────────┘
+```
+
+### Key Design Decision: No Server
+
+ForgeWeave v1.x included a custom MCP server (`research_mcp`) with browser automation, crawling, document processing, and vector embeddings. This was removed in v2.0.0. All agent orchestration, research, and web interaction now relies on:
+
+- **TUI-native features** (plugins, hooks, subagents)
+- **Playwright MCP** for browser automation (separate npm package)
+- **Headroom MCP** for context compression (separate npm package)
+- **Skills** for domain expertise (loaded by the TUI)
+
+The result is a simpler, more maintainable codebase with 4 core Python files instead of 10+.
 
 ---
 
-## Layer Responsibilities
+## Module Responsibilities
 
-### CLI Layer
+### `cli.py` (198 lines)
 
-Responsible for command routing, argument parsing, and user interaction.
+CLI entry point with two commands:
 
-```mermaid
-graph LR
-    subgraph Commands["CLI Commands"]
-        INIT["forge init<br/>→ scaffold project"]
-        VALIDATE["forge validate<br/>→ check specs"]
-        DOCTOR["forge doctor<br/>→ verify env"]
-    end
+| Command | Description |
+|---|---|
+| `forge init [--tui <name>] [--overwrite] [project_dir]` | Scaffold ForgeWeave in a project directory |
+| `forge doctor` | Verify environment prerequisites |
+| `forge --version` | Print version |
 
-    INIT --> R1["Runs interactive TUI selector"]
-    INIT --> R2["Copies template directory"]
-    VALIDATE --> R3["Validates SKILL.md / AGENT.md"]
-    DOCTOR --> R4["Checks Python + TUI versions"]
-```
+Interactive features:
+- TUI selector (prompts if `--tui` not provided)
+- Optional MCP server selection (InquirerPy confirm/secret/text prompts)
+- Non-interactive mode when `sys.stdin.isatty()` is false
 
-| Command | Status | Description |
-|---|---|---|
-| `forge init` | ✅ Implemented | Interactive TUI selector, scaffolds `.opencode/`, `.claude/`, etc. |
-| `forge validate` | ❌ Planned | Validates skills and agents against their respective specs |
-| `forge doctor` | ❌ Planned | Verifies environment prerequisites |
+### `server.py` (434 lines)
 
-### Core Layer
+Core scaffolding logic:
 
-Holds shared types, config loading, and constants used across all other layers.
+| Function | Purpose |
+|---|---|
+| `forge_init()` | Main entry: copies templates, writes MCP configs, updates AGENTS.md |
+| `_apply_mcp_configs()` | Writes MCP server entries into TUI-specific config files (opencode.json, .claude/settings.json, .gemini/settings.json, qwen-extension.json) |
+| `_process_agents_md()` | Updates AGENTS.md tables: ✓ for selected servers, — for unselected, "(not configured)" for unavailable tools |
+| `_get_mcp_server_config()` | Generates TUI-specific MCP block format |
 
-```mermaid
-classDiagram
-    class ForgeProject {
-        +str name
-        +str tui
-        +List~Skill~ skills
-        +List~Agent~ agents
-        +validate()
-        +to_dict()
-    }
+### MCP Server Registry
 
-    class Skill {
-        +str skill_id
-        +str name
-        +str version
-        +List~str~ tui_compatibility
-        +validate()
-    }
+All servers defined in `MCP_SERVER_DEFS`:
 
-    class Agent {
-        +str agent_id
-        +str name
-        +str version
-        +List~str~ tui_compatibility
-        +validate()
-    }
-
-    ForgeProject "1" --> "*" Skill : contains
-    ForgeProject "1" --> "*" Agent : contains
-```
-
-### Skill Engine
-
-Handles skill loading from template directories, parsing SKILL.md frontmatter, and validating against [SKILL_SPEC.md](./SKILL_SPEC.md).
-
-### Agent Engine
-
-Manages agent lifecycle (initialization → execution → stopping), invokes skills, and enforces execution rules defined in [AGENT_SPEC.md](./AGENT_SPEC.md).
-
-### Template Engine
-
-Manages versioned template rendering. Converts internal representations into Markdown files using TUI-specific templates.
-
-### Adapter Layer
-
-Stateless transformation boundary. Each adapter implements `BaseAdapter` and converts ForgeWeave internal structures into TUI-specific formats.
+| Server | Mandatory | Needs Key | Config Command |
+|---|---|---|---|
+| Playwright | ✅ | No | `npx @playwright/mcp@latest` |
+| Headroom | ✅ | No | `npx -y headroom mcp serve` |
+| Firecrawl | ❌ | Yes (`FIRECRAWL_API_KEY`) | `npx -y firecrawl-mcp` |
+| GitHub | ❌ | Yes (`GITHUB_PERSONAL_ACCESS_TOKEN`) | `npx -y @anthropic/github-mcp` |
+| SQLite | ❌ | No (needs db path) | `npx -y sqlite-mcp <path>` |
+| Context7 | ❌ | Optional (`CONTEXT7_API_KEY`) | `npx -y context7-mcp` |
 
 ---
 
 ## Data Flow
 
-```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant CLI as forge CLI
-    participant Core as Core Layer
-    participant Eng as Engine
-    participant Adp as Adapter
-    participant FS as File System
+```
+User runs: forge init --tui opencode ./project
 
-    Dev->>CLI: forge init
-    CLI->>CLI: Parse arguments
-    CLI->>CLI: Prompt TUI selection
-    CLI->>Core: Load ForgeProject config
-    Core->>Core: Validate project structure
-    Core->>Eng: Resolve templates for TUI
-    Eng->>Eng: Load skills & agents
-    Eng->>Eng: Validate against specs
-    Eng->>Adp: Transform to TUI format
-    Adp->>Adp: Apply naming conventions
-    Adp->>FS: Write .<tui>/ directory
-    FS-->>Dev: Project scaffolded
-
-    Note over Dev,FS: forge validate flow
-
-    Dev->>CLI: forge validate skill ./SKILL.md
-    CLI->>Core: Load file
-    Core->>Eng: Parse & validate
-    Eng-->>CLI: Validation result
-    CLI-->>Dev: Pass/Fail report
+1. CLI parses arguments, detects TUI
+2. (Optional) Prompts for MCP servers via InquirerPy
+3. forge_init() is called with:
+   - TUI name
+   - Project directory
+   - Selected MCP configs
+4. forge_init() copies template/opencode/ to project/
+5. _apply_mcp_configs() writes MCP entries to opencode.json
+6. _process_agents_md() updates AGENTS.md with ✓/— markers
+7. Result: fully scaffolded project with:
+   - All template files (.opencode/, skills, agents, commands, hooks)
+   - Configured MCP servers in TUI config
+   - AGENTS.md reflecting available MCP tools
 ```
 
 ---
 
 ## Supported Environments (TUIs)
 
-| TUI | Adapter Class | Status | Config Directory | Naming Convention |
-|---|---|---|---|---|
-| OpenCode | `OpenCodeAdapter` | ![Planned](https://img.shields.io/badge/-planned-888) | `.opencode/` | `kebab-case` |
-| Claude Code | `ClaudeAdapter` | ![Planned](https://img.shields.io/badge/-planned-888) | `.claude/` | `kebab-case` |
-| Gemini CLI | `GeminiAdapter` | ![Planned](https://img.shields.io/badge/-planned-888) | `.gemini/` | `snake_case` |
-| Qwen Code | `QwenAdapter` | ![Planned](https://img.shields.io/badge/-planned-888) | `.qwen/` | `kebab-case` |
+| TUI | Config Directory | Config File | MCP Key |
+|---|---|---|---|
+| OpenCode | `.opencode/` | `opencode.json` | `mcp` |
+| Claude Code | `.claude/` | `settings.json` | `mcpServers` |
+| Gemini CLI | `.gemini/` | `settings.json` | `mcp` |
+| Qwen Code | `.qwen/` | `qwen-extension.json` | `mcpServers` |
 
-> **NOTE:** Adding a new TUI requires implementing a new adapter class. See [ADAPTER_SPEC.md](./ADAPTER_SPEC.md) for the full process.
+All 4 TUIs share the same 20 skills in their template directory. The differences are:
+- Config file format (JSON structure varies)
+- Config file location (varies by TUI)
+- Hook script language (Python for Claude/Gemini, TypeScript for OpenCode/Qwen)
+- Agent/command file format (plain MD vs YAML+MD vs TOML)
+
+---
+
+## MCP Server Framework
+
+### Mandatory Servers (always included)
+
+1. **Playwright MCP** — Browser automation. Tools: `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_fill_form`, `browser_take_screenshot`, etc.
+2. **Headroom MCP** — Context compression. Tools: `headroom_compress`, `headroom_retrieve`, `headroom_stats`.
+
+### Optional Servers (prompted during `forge init`)
+
+3. **Firecrawl MCP** — Web search and scraping. Tools: `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`, `firecrawl_extract`.
+4. **GitHub MCP** — Repository management. Tools: `github_list_issues`, `github_create_issue`, `github_search_repos`, `github_get_file`, `github_create_pr`.
+5. **SQLite MCP** — Database queries. Tools: `sqlite_query`, `sqlite_execute`, `sqlite_list_tables`, `sqlite_describe_table`.
+6. **Context7 MCP** — Library/framework docs lookup. Tools: `resolve-library-id`, `query-docs`.
+
+### Configuration
+
+Each optional server is configured via:
+- A yes/no prompt for enabling
+- A secret prompt for API keys (if applicable)
+- A text prompt for paths (if applicable)
+
+Configs are written to the TUI's config file in the TUI-specific format.
 
 ---
 
 ## Design Principles
 
-```mermaid
-graph TD
-    subgraph Principles["Core Design Principles"]
-        DET["Determinism<br/>over Creativity"]
-        EXP["Explicit<br/>over Implicit"]
-        TEM["Template-Driven<br/>Generation"]
-        NOSTATE["No Hidden State"]
-        ADPT["Adapters Are<br/>Boundaries"]
-    end
-
-    DET --> R1["Same input → Same output"]
-    EXP --> R2["Undocumented = Nonexistent"]
-    TEM --> R3["No hardcoded generation"]
-    NOSTATE --> R4["All I/O declared & logged"]
-    ADPT --> R5["No business logic in adapters"]
-
-    style DET fill:#1a1a2e,color:#fff
-    style EXP fill:#1a1a2e,color:#fff
-    style TEM fill:#1a1a2e,color:#fff
-    style NOSTATE fill:#1a1a2e,color:#fff
-    style ADPT fill:#1a1a2e,color:#fff
-```
-
-### Determinism over Creativity
-
-System logic must produce the same output given the same input. No random behavior, no hidden branching, no undocumented side effects. This is non-negotiable — contributions that introduce non-determinism will be rejected.
-
-### Explicit over Implicit
-
-If behavior is not documented, it does not exist. Every decision in the codebase must be traceable to a documented rule. This applies to:
-
-- CLI commands and their flags
-- Skill execution steps and decision rules
-- Agent lifecycle and stopping conditions
-- Adapter transformation logic
-
-### Template-Driven Generation
-
-All project scaffolding is generated from versioned templates. No hardcoded generation logic exists outside the template system. This ensures:
-
-- **Consistency** across TUI outputs
-- **Versioning** of template formats
-- **Auditability** of what was generated
-
-### No Hidden State
-
-Agents and skills must declare what they read and write. State passed between modules must be explicit and logged. Any contribution that introduces implicit state passing will be rejected.
-
-### Adapters Are Boundaries
-
-Each TUI adapter is a strict transformation boundary. Business logic must never leak into adapters. Adapters are:
-
-- **Stateless** — no runtime state between calls
-- **Idempotent** — same input → same output every time
-- **Non-mutating** — never modify input objects
+- **Determinism over Creativity** — Same input → same output, always.
+- **Explicit over Implicit** — Undocumented behavior does not exist.
+- **Template-Driven Generation** — No hardcoded generation logic outside templates.
+- **No Hidden State** — All I/O declared and logged.
+- **Adapters Are Boundaries** — Business logic never leaks into TUI formats.
 
 ---
 
@@ -291,71 +207,30 @@ Each TUI adapter is a strict transformation boundary. Business logic must never 
 |---|---|---|
 | [SKILL_SPEC.md](./SKILL_SPEC.md) | 1.0 | Canonical format for all ForgeWeave skills |
 | [AGENT_SPEC.md](./AGENT_SPEC.md) | 1.0 | Canonical format for all ForgeWeave agents |
-| [ADAPTER_SPEC.md](./ADAPTER_SPEC.md) | 1.0 | How TUI adapters must be implemented |
+| [ADAPTER_SPEC.md](./ADAPTER_SPEC.md) | 1.0 | TUI adapter implementation guide |
 | [AGENTS.md](./AGENTS.md) | 1.0 | Project-level agent registration and configuration |
 
 ---
 
 ## Project Status
 
-ForgeWeave is in **early development** (v0.1.0 pre-release). The core specifications are defined, but the CLI and adapters are not yet fully implemented.
+**Current version:** 2.0.0
+**Status:** Stable
 
-### What's Done
+### Implemented
 
-- All three specifications (SKILL_SPEC, AGENT_SPEC, ADAPTER_SPEC) are complete and stable
-- Contributor documentation (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY) is in place
-- GitHub templates for issues and PRs are configured
-- Basic `forge init` CLI command
+- `forge init` with interactive TUI selector and MCP prompts
+- `forge doctor` environment check
+- 6 MCP server definitions with config generation for 4 TUI formats
+- Dynamic AGENTS.md with ✓/— markers
+- 20 template skills per TUI (distributed as template files)
+- Full template scaffolding (agents, commands, hooks, skills)
 
-### What's in Progress
+### Not Implemented (Future)
 
-- Template directory population for all 4 TUIs
-- Skill and agent validation engine
-- Adapter implementations
-
-### What's Planned
-
-| Feature | Priority | Timeline |
-|---|---|---|
-| `forge validate` command | High | Next release |
-| `forge doctor` command | High | Next release |
-| OpenCode adapter | High | v0.2.0 |
-| Claude Code adapter | High | v0.2.0 |
-| Gemini CLI adapter | Medium | v0.3.0 |
-| Qwen Code adapter | Medium | v0.3.0 |
-| Hook system | Low | v0.4.0 |
-| MCP integration | Low | v0.5.0 |
-
----
-
-## Roadmap
-
-```mermaid
-gantt
-    title ForgeWeave Roadmap
-    dateFormat  YYYY-MM-DD
-    axisFormat  %Y Q%q
-
-    section Foundation
-    Specs & Documentation      :done, 2025-10-01, 2025-12-31
-    CLI Skeleton (init)        :done, 2025-11-01, 2025-12-31
-
-    section Core Engine
-    Validation Engine           :active, 2026-01-01, 2026-04-30
-    Template Engine             :active, 2026-02-01, 2026-05-31
-    Agent Lifecycle             :2026-03-01, 2026-06-30
-
-    section Adapters
-    OpenCode Adapter            :2026-04-01, 2026-06-30
-    Claude Adapter              :2026-04-01, 2026-07-31
-    Gemini Adapter              :2026-05-01, 2026-08-31
-    Qwen Adapter                :2026-05-01, 2026-08-31
-
-    section Release
-    v0.1.0 Alpha                :milestone, 2026-03-01, 0d
-    v0.2.0 Beta                 :milestone, 2026-07-01, 0d
-    v1.0.0 Stable               :milestone, 2026-12-01, 0d
-```
+- `forge validate` command for SKILL.md/AGENT.md validation
+- Plugin system for community-contributed template overrides
+- Version migration commands for template updates
 
 ---
 
@@ -363,11 +238,10 @@ gantt
 
 | Term | Definition |
 |---|---|
-| **TUI** | Terminal User Interface — the coding environment (OpenCode, Claude Code, etc.) |
-| **Skill** | A reusable, deterministic behavior unit defined entirely in Markdown |
-| **Agent** | An autonomous worker that invokes skills following documented rules |
-| **Adapter** | A stateless transformation layer between ForgeWeave and a specific TUI |
-| **ForgeProject** | Internal representation of a project during scaffolding |
-| **TUIProject** | TUI-specific output structure after adapter transformation |
-| **MCP** | Model Context Protocol — a future integration point for exposing tools |
-| **Frontmatter** | YAML metadata block at the top of a Markdown file, delimited by `---` |
+| **TUI** | Terminal User Interface — coding environment (OpenCode, Claude Code, etc.) |
+| **Skill** | Reusable, deterministic behavior unit defined in SKILL.md |
+| **Agent** | Autonomous worker definition (AGENT.md) that invokes skills |
+| **MCP** | Model Context Protocol — standardized interface for exposing tools to AI agents |
+| **Adapter** | TUI-specific transformation logic (not a class; handled by template copying) |
+| **Hook** | Script that runs at specific lifecycle events (pre-command, post-tool-use, etc.) |
+| **Command** | TUI-native slash command (e.g., `/forge-research`) that maps to a skill workflow |
